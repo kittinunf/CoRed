@@ -85,7 +85,7 @@ fun <S : State, E : Environment> createStore(
 
 interface StateScannerEngine<S : State, E : Environment> {
 
-    var reducer: AnyReducer<S>
+    val reducer: AnyReducer<S>
     val middlewares: MutableList<AnyMiddleware<S, E>>
 
     suspend fun scan(storeType: StoreType<S, E>, state: S, action: Any): S

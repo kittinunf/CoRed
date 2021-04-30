@@ -57,8 +57,7 @@ private class StoreAdapterEngine<S : State, A : Any, E : Environment>(
         }
     }
 
-    // as we are using reducerMap instead, so this is pointing to NoopReducer()
-    override var reducer: AnyReducer<S> = NoopReducer()
+    override val reducer: AnyReducer<S> = combineReducers(reducerMap.values.toList() as List<AnyReducer<S>>)
 
     override val middlewares: MutableList<AnyMiddleware<S, E>>
         get() = TODO("Not yet implemented")
