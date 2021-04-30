@@ -16,6 +16,7 @@ class StoreAdapterTest {
 
     private val counterState = CounterState()
 
+    private val testScope = CoroutineScope(Dispatchers.Unconfined)
     private val reducers = mapOf(
         "inc" to Reducer { currentState: CounterState, action: Increment ->
             currentState.copy(counter = currentState.counter + action.by)
@@ -25,7 +26,6 @@ class StoreAdapterTest {
         }
     )
 
-    private val testScope = CoroutineScope(Dispatchers.Unconfined)
     private val store = createStore(testScope, counterState, reducers)
 
     @Test
@@ -162,7 +162,7 @@ class StoreAdapterTest {
                     }
                 }
 
-                override val environment: CounterEnvironment =  CounterEnvironment
+                override val environment: CounterEnvironment = CounterEnvironment
             }
         )
 

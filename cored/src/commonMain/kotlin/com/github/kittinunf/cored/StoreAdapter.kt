@@ -16,6 +16,7 @@ interface Identifiable {
         get() = this::class.simpleName!!
 }
 
+typealias ReducerType<S, A> = Pair<String, Reducer<S, A>>
 typealias EffectType<S, A, E> = Pair<String, Middleware<S, A, E>>
 
 fun <S : State, A : Any> createStore(
@@ -23,7 +24,7 @@ fun <S : State, A : Any> createStore(
     initialState: S,
     reducers: Map<String, Reducer<S, A>>
 ): StoreType<S, Nothing> {
-    return StoreAdapter(Store(scope, initialState, engine = StoreAdapterEngine(reducers.toMutableMap(), mutableMapOf())))
+    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine(reducers.toMutableMap(), mutableMapOf())))
 }
 
 fun <S : State, A : Any, E : Environment> createStore(
@@ -32,7 +33,7 @@ fun <S : State, A : Any, E : Environment> createStore(
     reducers: Map<String, Reducer<S, A>>,
     middlewares: Map<String, Middleware<S, A, E>>
 ): StoreType<S, E> {
-    return StoreAdapter(Store(scope, initialState, engine = StoreAdapterEngine(reducers.toMutableMap(), middlewares.toMutableMap())))
+    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine(reducers.toMutableMap(), middlewares.toMutableMap())))
 }
 
 private class StoreAdapterEngine<S : State, A : Any, E : Environment>(

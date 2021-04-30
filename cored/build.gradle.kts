@@ -20,7 +20,7 @@ kotlin {
     ios {
         binaries {
             framework {
-                baseName = "Cored"
+                baseName = "CoRed"
             }
         }
     }
@@ -28,7 +28,6 @@ kotlin {
         all {
             languageSettings.apply {
                 useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlin.time.ExperimentalTime")
                 useExperimentalAnnotation("kotlinx.coroutines.OptInAnnotation")
             }
         }
