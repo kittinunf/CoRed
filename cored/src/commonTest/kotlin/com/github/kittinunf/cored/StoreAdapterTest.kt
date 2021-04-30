@@ -218,7 +218,7 @@ class StoreAdapterTest {
     @Test
     fun `should invoke even we don't provide the customization on the identifier with the qualified name`() {
         val reducers = mapOf(
-            "com.github.kittinunf.cored.Set" to Reducer { currentState: CounterState, action: Set ->
+            "Set" to Reducer { currentState: CounterState, action: Set ->
                 currentState.copy(counter = action.value)
             }
         )

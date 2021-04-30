@@ -13,7 +13,7 @@ private class StoreAdapter<S : State, E : Environment>(private val store: Store<
 interface Identifiable {
 
     val identifier: String
-        get() = this::class.qualifiedName!!
+        get() = this::class.simpleName!!
 }
 
 typealias EffectType<S, A, E> = Pair<String, Middleware<S, A, E>>
