@@ -269,6 +269,6 @@ class StoreAdapterTest {
             localStore.dispatch(Increment(100))
         }
 
-        assertEquals(-90, localStore.currentState.counter)
+        assertEquals(-80, localStore.currentState.counter)
     }
 }

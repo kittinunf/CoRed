@@ -4,7 +4,7 @@ on: [ pull_request ]
 
 jobs:
   test:
-    name: Unit tests
+    name: Build
     runs-on: macos-latest
     steps:
       - name: Check out code
