@@ -5,8 +5,8 @@ plugins {
     id("publication")
 }
 
-group = "com.github.kittinunf.cored"
-version = "0.1.0"
+group = Publishing.groupId
+version = Publishing.version
 
 // this is workaround to make it work with Kotlin 1.4, it will not be needed anymore in Kotlin 1.5
 android {

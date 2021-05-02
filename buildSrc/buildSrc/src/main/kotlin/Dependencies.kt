@@ -56,6 +56,11 @@ object Jacoco {
 }
 
 // Publishing
+object Publishing {
+    const val groupId = "com.github.kittinunf.cored"
+    const val version = "0.1.0"
+}
+
 object GradleNexus {
 
     private const val version = "1.1.0"
