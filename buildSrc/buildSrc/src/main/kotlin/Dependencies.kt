@@ -54,3 +54,11 @@ object JUnit {
 object Jacoco {
     const val version = "0.8.6"
 }
+
+// Publishing
+object GradleNexus {
+
+    private const val version = "1.1.0"
+
+    const val pluginNexus = "io.github.gradle-nexus:publish-plugin:$version"
+}
