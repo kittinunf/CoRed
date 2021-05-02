@@ -13,8 +13,8 @@ plugins {
 ext["signing.keyId"] = null
 ext["signing.password"] = null
 ext["signing.secretKeyRingFile"] = null
-ext["ossrhUsername"] = null
-ext["ossrhPassword"] = null
+ext["sonatype.username"] = null
+ext["sonatype.password"] = null
 
 // Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile = project.rootProject.file("local.properties")
@@ -30,8 +30,8 @@ if (secretPropsFile.exists()) {
     ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
     ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
-    ext["ossrhUsername"] = System.getenv("OSSRH_USERNAME")
-    ext["ossrhPassword"] = System.getenv("OSSRH_PASSWORD")
+    ext["sonatype.username"] = System.getenv("SONATYPE_USERNAME")
+    ext["sonatype.password"] = System.getenv("SONATYPE_PASSWORD")
 }
 
 val javadocJar by tasks.registering(Jar::class) {
@@ -47,17 +47,17 @@ publishing {
             name = "sonatype"
             setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
-                username = getExtraString("ossrhUsername")
-                password = getExtraString("ossrhPassword")
+                username = getExtraString("sonatype.username")
+                password = getExtraString("sonatype.password")
             }
         }
     }
 
     // Configure all publications
     publications.withType<MavenPublication> {
+        artifactId = project.name
 
-        // Stub javadoc.jar artifact
-        artifact(javadocJar.get())
+        artifact(javadocJar)
 
         // Provide artifacts information requited by Maven Central
         pom {
@@ -69,19 +69,18 @@ publishing {
                 license {
                     name.set("MIT")
                     url.set("https://opensource.org/licenses/MIT")
+                    distribution.set("repo")
                 }
             }
             developers {
                 developer {
                     id.set("kittinunf")
                     name.set("Kittinun Vantasin")
-                    email.set("kittinun.f@gmail.com")
                 }
             }
             scm {
                 url.set("https://github.com/kittinunf/CoRed")
             }
-
         }
     }
 }
