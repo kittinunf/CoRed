@@ -12,8 +12,8 @@ tool. However, some might find it to be too complicated or hard to use/understan
 vanilla Redux-like implementation is quite boilerplate-y. There is even
 a [page](https://redux.js.org/recipes/reducing-boilerplate/) from the official Redux.js on how to
 reduce the boilerplate. In this implementation, we try to solve it by introducing the more friendly
-API and translating that into Kotlin in order to be a bit more accessible to mobile dev to
-use in their projects.
+API and translating that into Kotlin in order to be a bit more accessible to mobile dev to use in
+their projects.
 
 ## Installation
 
@@ -97,7 +97,10 @@ store.states
 store.dispatch(Load)
 ```
 
-Please check it out now!
+For documentation, check more details in the README [file](./cored/README.md)
+
+For example, check more tests in the
+commonText [folder](./cored/src/commonTest/kotlin/com/github/kittinunf/cored/StoreAdapterTest.kt)
 
 ## Credits
 
