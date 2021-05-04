@@ -9,5 +9,6 @@ pluginManagement {
     }
 }
 
+includeBuild("plugins")
+
 include(":cored")
-includeBuild("convention-plugins")

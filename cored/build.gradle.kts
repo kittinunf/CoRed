@@ -1,3 +1,5 @@
+import java.io.IOException
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -5,8 +7,12 @@ plugins {
     id("publication")
 }
 
+val isReleaseBuild: Boolean
+    get() = properties.containsKey("release")
+
 group = Publishing.groupId
-version = Publishing.version
+val gitSha = "git rev-parse --short HEAD".runCommand(project.rootDir)?.trim().orEmpty()
+version = if (isReleaseBuild) Publishing.version else "main-$gitSha"
 
 // this is workaround to make it work with Kotlin 1.4, it will not be needed anymore in Kotlin 1.5
 android {
@@ -50,19 +56,17 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation(Coroutines.android)
-            }
-        }
+        val androidMain by getting {}
 
         val androidTest by getting {
             dependencies {
                 implementation(Coroutines.test)
-
                 implementation(Kotlin.testJunit)
             }
         }
+
+        val iosMain by getting {}
+        val iosTest by getting {}
     }
 }
 
@@ -96,4 +100,19 @@ android {
             isMinifyEnabled = false
         }
     }
+}
+
+fun String.runCommand(workingDir: File): String? = try {
+    val parts = split("\\s".toRegex())
+    val proc = ProcessBuilder(*parts.toTypedArray())
+        .directory(workingDir)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+
+    proc.waitFor(30, TimeUnit.SECONDS)
+    proc.inputStream.bufferedReader().readText()
+} catch (e: IOException) {
+    e.printStackTrace()
+    null
 }
