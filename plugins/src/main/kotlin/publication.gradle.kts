@@ -10,30 +10,24 @@ plugins {
 }
 
 // Stub secrets to let the project sync and build without the publication values set up
-ext["signing.keyId"] = null
+ext["signing.key"] = null
 ext["signing.password"] = null
-ext["signing.secretKeyRingFile"] = null
 ext["sonatype.username"] = null
 ext["sonatype.password"] = null
-ext["sonatype.profileId"] = null
 
 // Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile = project.rootProject.file("local.properties")
 if (secretPropsFile.exists()) {
     secretPropsFile.reader().use {
-        Properties().apply {
-            load(it)
-        }
+        Properties().apply { load(it) }
     }.onEach { (name, value) ->
         ext[name.toString()] = value
     }
 } else {
-    ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+    ext["signing.key"] = System.getenv("SIGNING_KEY")
     ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
-    ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
     ext["sonatype.username"] = System.getenv("SONATYPE_USERNAME")
     ext["sonatype.password"] = System.getenv("SONATYPE_PASSWORD")
-    ext["sonatype.profileId"] = System.getenv("SONATYPE_PROFILE_ID")
 }
 
 val javadocJar by tasks.registering(Jar::class) {
@@ -102,5 +96,10 @@ publishing {
 }
 
 signing {
+    val signingKey = project.ext["signing.key"] as? String
+    val signingPassword = project.ext["signing.password"] as? String
+    if (signingKey == null || signingPassword == null) return@signing
+
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }

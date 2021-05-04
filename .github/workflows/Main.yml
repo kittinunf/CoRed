@@ -20,14 +20,6 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Prepare Key content
-        env:
-          GPG_KEY_CONTENTS: ${{ secrets.GPG_KEY_CONTENTS }}
-          SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
-        run: |
-          git fetch --unshallow
-          sudo bash -c "echo '$GPG_KEY_CONTENTS' | base64 -d > '$SIGNING_SECRET_KEY_RING_FILE'"
-
       - name: Publish to MavenCentral
         run: ./gradlew publishAllPublicationsToSonatypeRepository --max-workers 1
         env:
