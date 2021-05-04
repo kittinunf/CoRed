@@ -1,5 +1,8 @@
 # CoRed
 
+[![Kotlin](https://img.shields.io/badge/kotlin-1.4.3-blue.svg)](http://kotlinlang.org)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.kittinunf.cored/cored?label=Maven%20Central)](https://search.maven.org/artifact/com.github.kittinunf.cored/cored)
+
 CoRed is Redux-like implementation that maintains the benefits of Redux's core idea without the
 boilerplate. No more action types, action creators, switch statements or complicated setup. It is
 Kotlin and it has coroutine supported right out-of-the-box. Also, yes, it is Kotlin Multiplatform
@@ -17,7 +20,25 @@ their projects.
 
 ## Installation
 
-TBD
+Add mavenCentral into your dependencies' repositories configuration
+
+```kotlin
+repositories {
+    mavenCentral()
+    // ...
+}
+```
+
+Then, just add the dependency to your `commonMain` dependencies
+
+```kotlin
+commonMain {
+    dependencies {
+        // ...
+        implementation("com.github.kittinunf.cored:cored:«version»")
+    }
+}
+``` 
 
 ## How to set this up?
 
