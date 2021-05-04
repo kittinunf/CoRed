@@ -1,6 +1,6 @@
 object Kotlin {
 
-    private const val version = "1.4.31"
+    private const val version = "1.4.32"
 
     const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
 
@@ -55,7 +55,7 @@ object Jacoco {
 // Publishing
 object Publishing {
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.1.0"
+    const val version = "0.1.1"
 }
 
 object GradleNexus {
