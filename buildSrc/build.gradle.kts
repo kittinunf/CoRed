@@ -22,5 +22,4 @@ dependencies {
     // plugins
     implementation(Android.plugin)
     implementation(JUnit.pluginJacoco)
-    implementation(GradleNexus.pluginNexus)
 }

@@ -15,6 +15,7 @@ ext["signing.password"] = null
 ext["signing.secretKeyRingFile"] = null
 ext["sonatype.username"] = null
 ext["sonatype.password"] = null
+ext["sonatype.profileId"] = null
 
 // Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile = project.rootProject.file("local.properties")
@@ -32,6 +33,7 @@ if (secretPropsFile.exists()) {
     ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_SECRET_KEY_RING_FILE")
     ext["sonatype.username"] = System.getenv("SONATYPE_USERNAME")
     ext["sonatype.password"] = System.getenv("SONATYPE_PASSWORD")
+    ext["sonatype.profileId"] = System.getenv("SONATYPE_PROFILE_ID")
 }
 
 val javadocJar by tasks.registering(Jar::class) {
@@ -40,12 +42,22 @@ val javadocJar by tasks.registering(Jar::class) {
 
 fun getExtraString(name: String) = ext[name]?.toString()
 
+val isReleaseBuild: Boolean
+    get() = properties.containsKey("release")
+
 publishing {
     // Configure maven central repository
     repositories {
         maven {
             name = "sonatype"
-            setUrl("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            url = uri(
+                if (isReleaseBuild) {
+                    "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                } else {
+                    "https://oss.sonatype.org/content/repositories/snapshots"
+                }
+            )
+
             credentials {
                 username = getExtraString("sonatype.username")
                 password = getExtraString("sonatype.password")
@@ -79,7 +91,11 @@ publishing {
                 }
             }
             scm {
-                url.set("https://github.com/kittinunf/CoRed")
+                val siteUrl = "https://github.com/kittinunf/CoRed"
+                val gitUrl = "https://github.com/kittinunf/CoRed.git"
+                connection.set(gitUrl)
+                developerConnection.set(gitUrl)
+                url.set(siteUrl)
             }
         }
     }
