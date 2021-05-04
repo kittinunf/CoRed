@@ -97,10 +97,10 @@ store.states
 store.dispatch(Load)
 ```
 
-For documentation, check more details in the README [file](./cored/README.md)
+For documentation, check more details in the [README](./cored/README.md)
 
 For example, check more tests in the
-commonText [folder](./cored/src/commonTest/kotlin/com/github/kittinunf/cored/StoreAdapterTest.kt)
+[commonTest](./cored/src/commonTest/kotlin/com/github/kittinunf/cored/StoreAdapterTest.kt) folder.
 
 ## Credits
 
