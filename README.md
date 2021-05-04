@@ -1,6 +1,6 @@
 # CoRed
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.4.3-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.4-blue.svg)](http://kotlinlang.org)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.kittinunf.cored/cored?label=Maven%20Central)](https://search.maven.org/artifact/com.github.kittinunf.cored/cored)
 
 CoRed is Redux-like implementation that maintains the benefits of Redux's core idea without the
