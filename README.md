@@ -10,12 +10,14 @@ supported (https://kotlinlang.org/docs/mpp-intro.html)
 
 ## Features
 
-CoRed is opinionated way to setup the Redux implementation. Redux is an amazing state management
+CoRed is an opinionated way to setup the Redux implementation. Why we need CoRed? Redux is an amazing state management
 tool. However, some might find it to be too complicated or hard to use/understand, because the plain
-vanilla Redux-like implementation is quite boilerplate-y. There is even
-a [page](https://redux.js.org/recipes/reducing-boilerplate/) from the official Redux.js on how to
-reduce the boilerplate. In this implementation, we try to solve it by introducing the more friendly
-API and translating that into Kotlin in order to be a bit more accessible to mobile dev to use in
+vanilla Redux-like implementation is quite boilerplate-y. There is an even
+[page](https://redux.js.org/recipes/reducing-boilerplate/) from the official Redux.js on how to
+reduce the boilerplate. That's why we develop CoRed. 
+
+In CoRed's implementation, we are trying to solve the same problem with original Redux by introducing the more friendly
+API, then translating that into Kotlin in order to be a bit more accessible to mobile dev to use in
 their projects.
 
 ## Installation
