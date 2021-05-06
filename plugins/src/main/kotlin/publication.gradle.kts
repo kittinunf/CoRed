@@ -9,13 +9,11 @@ plugins {
     signing
 }
 
-// Stub secrets to let the project sync and build without the publication values set up
 ext["signing.key"] = null
 ext["signing.password"] = null
 ext["sonatype.username"] = null
 ext["sonatype.password"] = null
 
-// Grabbing secrets from local.properties file or from environment variables, which could be used on CI
 val secretPropsFile = project.rootProject.file("local.properties")
 if (secretPropsFile.exists()) {
     secretPropsFile.reader().use {
@@ -40,7 +38,6 @@ val isReleaseBuild: Boolean
     get() = properties.containsKey("release")
 
 publishing {
-    // Configure maven central repository
     repositories {
         maven {
             name = "sonatype"

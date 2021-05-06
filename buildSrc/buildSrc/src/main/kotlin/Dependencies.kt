@@ -1,3 +1,4 @@
+// Main libraries
 object Kotlin {
 
     private const val version = "1.4.32"
@@ -32,10 +33,10 @@ object AndroidX {
 
 object Coroutines {
 
-    private const val mtVersion = "1.4.3-native-mt"
+    private const val version = "1.4.3-native-mt"
 
-    const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$mtVersion"
-    const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$mtVersion"
+    const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
+    const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
 }
 
 // Test libraries
@@ -52,10 +53,10 @@ object Jacoco {
     const val version = "0.8.6"
 }
 
-// Publishing
+// Publishing libraries
 object Publishing {
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.1.1"
+    const val version = "0.1.2"
 }
 
 object GradleNexus {
