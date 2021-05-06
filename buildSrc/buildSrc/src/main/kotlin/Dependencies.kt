@@ -32,10 +32,10 @@ object AndroidX {
 
 object Coroutines {
 
-    private const val mtVersion = "1.4.3-native-mt"
+    private const val version = "1.4.3-native-mt"
 
-    const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$mtVersion"
-    const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$mtVersion"
+    const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
+    const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
 }
 
 // Test libraries
