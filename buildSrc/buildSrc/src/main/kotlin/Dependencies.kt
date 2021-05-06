@@ -1,3 +1,4 @@
+// Main libraries
 object Kotlin {
 
     private const val version = "1.4.32"
@@ -52,10 +53,10 @@ object Jacoco {
     const val version = "0.8.6"
 }
 
-// Publishing
+// Publishing libraries
 object Publishing {
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.1.1"
+    const val version = "0.1.2"
 }
 
 object GradleNexus {
