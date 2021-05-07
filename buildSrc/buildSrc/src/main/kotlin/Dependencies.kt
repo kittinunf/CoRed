@@ -18,7 +18,7 @@ object Android {
 
     const val buildToolsVersion = "30.0.3"
 
-    private const val version = "7.0.0-alpha14"
+    private const val version = "7.0.0-alpha15"
     const val plugin = "com.android.tools.build:gradle:$version"
 }
 
