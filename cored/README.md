@@ -160,4 +160,6 @@ scope.launch {
             println(state)
         }
 }
+
+store.dispatch(LoadAction) // dispatch some pre-defined action
 ```
