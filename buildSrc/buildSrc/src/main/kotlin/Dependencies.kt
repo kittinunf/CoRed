@@ -1,13 +1,9 @@
 // Main libraries
 object Kotlin {
 
-    private const val version = "1.4.32"
+    private const val version = "1.5.0"
 
     const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
-
-    const val testCommon = "org.jetbrains.kotlin:kotlin-test-common"
-    const val testAnnotationsCommon = "org.jetbrains.kotlin:kotlin-test-annotations-common"
-    const val testJunit = "org.jetbrains.kotlin:kotlin-test-junit"
 }
 
 object Android {
@@ -29,7 +25,7 @@ object AndroidX {
 
 object Coroutines {
 
-    private const val version = "1.4.3-native-mt"
+    private const val version = "1.5.0-RC-native-mt"
 
     const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -46,7 +42,7 @@ object JUnit {
 }
 
 object Jacoco {
-    const val version = "0.8.6"
+    const val version = "0.8.7"
 }
 
 // Publishing libraries

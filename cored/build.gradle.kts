@@ -42,8 +42,7 @@ kotlin {
 
         val commonTest by getting {
             dependencies {
-                implementation(Kotlin.testCommon)
-                implementation(Kotlin.testAnnotationsCommon)
+                implementation(kotlin("test"))
             }
         }
 
@@ -52,7 +51,6 @@ kotlin {
         val androidTest by getting {
             dependencies {
                 implementation(Coroutines.test)
-                implementation(Kotlin.testJunit)
             }
         }
 
