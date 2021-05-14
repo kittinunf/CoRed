@@ -33,9 +33,9 @@ enum class Order {
 
 typealias AnyMiddleware<S> = Middleware<S, Any>
 
-interface Middleware<S : State, in A : Any> {
+fun interface Middleware<S : State, in A : Any> {
 
-    fun process(order: Order, store: StoreType<S>, state: S, action: A) {}
+    operator fun invoke(order: Order, store: StoreType<S>, state: S, action: A)
 }
 
 interface StoreType<S : State> {
@@ -55,12 +55,14 @@ interface StoreType<S : State> {
     fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
 }
 
+@Suppress("FunctionName")
 fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducer: AnyReducer<S>,
 ): StoreType<S> = Store(scope, initialState, DefaultEngine(reducer, mutableListOf()))
 
+@Suppress("FunctionName")
 fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
@@ -70,6 +72,7 @@ fun <S : State> Store(
     return Store(scope, initialState, DefaultEngine(reducer, mutableListOf(middleware)))
 }
 
+@Suppress("FunctionName")
 fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
@@ -91,9 +94,9 @@ private class DefaultEngine<S : State>(override var reducer: AnyReducer<S>, over
     StateScannerEngine<S> {
 
     override suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S {
-        middlewares.onEach { it.process(Order.BeforeReduce, storeType, state, action) }
+        middlewares.onEach { it(Order.BeforeReduce, storeType, state, action) }
         val nextState = reducer(state, action)
-        middlewares.onEach { it.process(Order.AfterReduced, storeType, nextState, action) }
+        middlewares.onEach { it(Order.AfterReduced, storeType, nextState, action) }
         return nextState
     }
 }

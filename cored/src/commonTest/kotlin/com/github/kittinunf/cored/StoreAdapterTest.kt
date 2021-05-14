@@ -153,13 +153,11 @@ class StoreAdapterTest {
         val sideEffectData = SideEffectData(100)
 
         val middlewares = mapOf(
-            "inc" to object : Middleware<CounterState, Increment> {
-                override fun process(order: Order, store: CounterStore, state: CounterState, action: Increment) {
-                    if (order == Order.BeforeReduce) {
-                        assertEquals(0, state.counter)
-                    } else {
-                        sideEffectData.value = sideEffectData.value + state.counter
-                    }
+            "inc" to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                } else {
+                    sideEffectData.value = sideEffectData.value + state.counter
                 }
             }
         )
@@ -187,14 +185,11 @@ class StoreAdapterTest {
     @Test
     fun `should invoke middleware in the correct order`() {
         val middlewares = mapOf(
-            "inc" to object : Middleware<CounterState, Increment> {
-
-                override fun process(order: Order, store: CounterStore, state: CounterState, action: Increment) {
-                    if (order == Order.BeforeReduce) {
-                        assertEquals(0, state.counter)
-                    } else {
-                        assertEquals(100, state.counter)
-                    }
+            "inc" to Middleware<CounterState, Increment> { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                } else {
+                    assertEquals(100, state.counter)
                 }
             }
         )
@@ -236,17 +231,15 @@ class StoreAdapterTest {
     @Test
     fun `should be able to dispatch action from the middleware`() {
         val middlewares = mapOf(
-            "inc" to object : Middleware<CounterState, Increment> {
-                override fun process(order: Order, store: CounterStore, state: CounterState, action: Increment) {
-                    if (order == Order.AfterReduced) {
-                        if (state.counter == 100) {
-                            // dispatch another action from middleware
-                            runBlockingTest {
-                                delay(1000)
-                                store.dispatch(Increment(10))
-                            }
-                            store.tryDispatch(Decrement(200))
+            "inc" to Middleware<CounterState, Increment> { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+                if (order == Order.AfterReduced) {
+                    if (state.counter == 100) {
+                        // dispatch another action from middleware
+                        runBlockingTest {
+                            delay(1000)
+                            store.dispatch(Increment(10))
                         }
+                        store.tryDispatch(Decrement(200))
                     }
                 }
             }

@@ -12,6 +12,7 @@ interface Identifiable {
 typealias ReducerType<S, A> = Pair<String, Reducer<S, A>>
 typealias EffectType<S, A> = Pair<String, Middleware<S, A>>
 
+@Suppress("FunctionName")
 fun <S : State, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
@@ -20,6 +21,7 @@ fun <S : State, A : Any> Store(
     return StoreAdapter(Store(scope, initialState, StoreAdapterEngine(reducers.toMutableMap(), mutableMapOf())))
 }
 
+@Suppress("FunctionName")
 fun <S : State, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
@@ -43,9 +45,9 @@ private class StoreAdapterEngine<S : State, A : Any>(
         val typedAction = action as? A
 
         return if (typedAction == null) state else {
-            middleware?.process(Order.BeforeReduce, storeType, state, typedAction)
+            middleware?.invoke(Order.BeforeReduce, storeType, state, typedAction)
             val nextState = reducer(state, typedAction)
-            middleware?.process(Order.AfterReduced, storeType, nextState, typedAction)
+            middleware?.invoke(Order.AfterReduced, storeType, nextState, typedAction)
             nextState
         }
     }
