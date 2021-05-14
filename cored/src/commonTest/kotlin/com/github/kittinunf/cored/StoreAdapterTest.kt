@@ -26,7 +26,7 @@ class StoreAdapterTest {
         }
     )
 
-    private val store = createStore(testScope, counterState, reducers)
+    private val store = Store(testScope, counterState, reducers)
 
     @Test
     fun `should increment state`() {
@@ -153,7 +153,7 @@ class StoreAdapterTest {
         val sideEffectData = SideEffectData(100)
 
         val middlewares = mapOf(
-            "inc" to object : Middleware<CounterState, Increment, CounterEnvironment> {
+            "inc" to object : Middleware<CounterState, Increment> {
                 override fun process(order: Order, store: CounterStore, state: CounterState, action: Increment) {
                     if (order == Order.BeforeReduce) {
                         assertEquals(0, state.counter)
@@ -161,12 +161,10 @@ class StoreAdapterTest {
                         sideEffectData.value = sideEffectData.value + state.counter
                     }
                 }
-
-                override val environment: CounterEnvironment = CounterEnvironment
             }
         )
 
-        val localStore = createStore(testScope, CounterState(), reducers, middlewares)
+        val localStore = Store(testScope, CounterState(), reducers, middlewares)
 
         runBlockingTest {
             localStore.states
@@ -189,7 +187,7 @@ class StoreAdapterTest {
     @Test
     fun `should invoke middleware in the correct order`() {
         val middlewares = mapOf(
-            "inc" to object : Middleware<CounterState, Increment, CounterEnvironment> {
+            "inc" to object : Middleware<CounterState, Increment> {
 
                 override fun process(order: Order, store: CounterStore, state: CounterState, action: Increment) {
                     if (order == Order.BeforeReduce) {
@@ -198,12 +196,10 @@ class StoreAdapterTest {
                         assertEquals(100, state.counter)
                     }
                 }
-
-                override val environment: CounterEnvironment = CounterEnvironment
             }
         )
 
-        val localStore = createStore(testScope, CounterState(), reducers, middlewares)
+        val localStore = Store(testScope, CounterState(), reducers, middlewares)
 
         runBlockingTest {
             localStore.states
@@ -223,7 +219,7 @@ class StoreAdapterTest {
             }
         )
 
-        val localStore = createStore(testScope, CounterState(), reducers)
+        val localStore = Store(testScope, CounterState(), reducers)
 
         runBlockingTest {
             localStore.states
@@ -240,7 +236,7 @@ class StoreAdapterTest {
     @Test
     fun `should be able to dispatch action from the middleware`() {
         val middlewares = mapOf(
-            "inc" to object : Middleware<CounterState, Increment, CounterEnvironment> {
+            "inc" to object : Middleware<CounterState, Increment> {
                 override fun process(order: Order, store: CounterStore, state: CounterState, action: Increment) {
                     if (order == Order.AfterReduced) {
                         if (state.counter == 100) {
@@ -253,12 +249,10 @@ class StoreAdapterTest {
                         }
                     }
                 }
-
-                override val environment: CounterEnvironment = CounterEnvironment
             }
         )
 
-        val localStore = createStore(testScope, CounterState(), reducers, middlewares)
+        val localStore = Store(testScope, CounterState(), reducers, middlewares)
 
         runBlockingTest {
             localStore.states

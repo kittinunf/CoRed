@@ -25,9 +25,7 @@ class Decrement(val by: Int) : CounterAction(), Identifiable {
 
 class Set(val value: Int) : CounterAction(), Identifiable
 
-object CounterEnvironment : Environment
-
-typealias CounterStore = StoreType<CounterState, CounterEnvironment>
+typealias CounterStore = StoreType<CounterState>
 
 class ReduxTest {
 
@@ -44,14 +42,14 @@ class ReduxTest {
     }
 
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
-    private val store = createStore<CounterState, CounterEnvironment>(testScope, counterState, counterReducer)
+    private val store = Store(testScope, counterState, counterReducer)
 
     @BeforeTest
     fun before() {}
 
     @Test
     fun `should increment state`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -71,7 +69,7 @@ class ReduxTest {
 
     @Test
     fun `should decrement state`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -93,7 +91,7 @@ class ReduxTest {
 
     @Test
     fun `should emit initial value`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -107,7 +105,7 @@ class ReduxTest {
 
     @Test
     fun `should emit value if the state not changed`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -126,7 +124,7 @@ class ReduxTest {
 
     @Test
     fun `should not emit same value up until the same state is emitted`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -147,7 +145,7 @@ class ReduxTest {
 
     @Test
     fun `should dispatch multiple value from Flow emitter block`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -173,7 +171,7 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = object : AnyMiddleware<CounterState, CounterEnvironment> {
+        val middleware = object : AnyMiddleware<CounterState> {
             override fun process(order: Order, store: CounterStore, state: CounterState, action: Any) {
                 if (order == Order.BeforeReduce) {
                     assertEquals(0, state.counter)
@@ -182,13 +180,11 @@ class ReduxTest {
                     sideEffectData.value = sideEffectData.value + state.counter
                 }
             }
-
-            override val environment: CounterEnvironment = CounterEnvironment
         }
 
         store.addMiddleware(middleware)
 
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .printDebug()
@@ -206,7 +202,7 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = object : AnyMiddleware<CounterState, CounterEnvironment> {
+        val middleware = object : AnyMiddleware<CounterState> {
             override fun process(order: Order, store: CounterStore, state: CounterState, action: Any) {
                 if (order == Order.BeforeReduce) {
                     assertEquals(0, state.counter)
@@ -215,13 +211,11 @@ class ReduxTest {
                     sideEffectData.value = sideEffectData.value + state.counter
                 }
             }
-
-            override val environment: CounterEnvironment = CounterEnvironment
         }
 
         store.addMiddleware(middleware)
 
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .printDebug()
@@ -234,7 +228,7 @@ class ReduxTest {
 
         store.removeMiddleware(middleware)
 
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.dispatch(Increment(100))
             store.dispatch(Decrement(100))
         }
@@ -244,7 +238,7 @@ class ReduxTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val middleware = object : AnyMiddleware<CounterState, CounterEnvironment> {
+        val middleware = object : AnyMiddleware<CounterState> {
             override fun process(order: Order, store: CounterStore, state: CounterState, action: Any) {
                 if (order == Order.BeforeReduce) {
                     assertEquals(0, state.counter)
@@ -254,13 +248,11 @@ class ReduxTest {
                     assertTrue(action is Increment)
                 }
             }
-
-            override val environment: CounterEnvironment = CounterEnvironment
         }
 
         store.addMiddleware(middleware)
 
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .printDebug()
@@ -272,28 +264,26 @@ class ReduxTest {
 
     @Test
     fun `should be able to dispatch action from the middleware`() {
-        val middleware = object : AnyMiddleware<CounterState, CounterEnvironment> {
-            override fun process(order: Order, store: StoreType<CounterState, CounterEnvironment>, state: CounterState, action: Any) {
+        val middleware = object : AnyMiddleware<CounterState> {
+            override fun process(order: Order, store: StoreType<CounterState>, state: CounterState, action: Any) {
                 if (order == Order.BeforeReduce) {
                     assertTrue(action is Increment)
                 } else {
                     assertTrue(action is Increment)
                     if (state.counter == 100) {
                         // dispatch another action from middleware
-                        com.github.kittinunf.cored.runBlockingTest {
+                        runBlockingTest {
                             store.dispatch(Increment(10))
                         }
                         store.tryDispatch(Increment(200))
                     }
                 }
             }
-
-            override val environment: CounterEnvironment = CounterEnvironment
         }
 
         store.addMiddleware(middleware)
 
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .printDebug()
@@ -310,7 +300,7 @@ class ReduxTest {
 
     @Test
     fun `should ignore action that is not unknown with the current known action reducer`() {
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -339,9 +329,9 @@ class ReduxTest {
             }
         }
 
-        val localStore = createStore(testScope, counterState, combineReducers(localReducer, counterReducer))
+        val localStore = Store(testScope, counterState, combineReducers(localReducer, counterReducer))
 
-        com.github.kittinunf.cored.runBlockingTest {
+        runBlockingTest {
             localStore.states
                 .withIndex()
                 .onEach { (index, value) ->

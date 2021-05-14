@@ -25,8 +25,6 @@ object AndroidX {
     object Versions {
         const val junit = "1.1.1"
     }
-
-    const val testJunit = "androidx.test.ext:junit:${Versions.junit}"
 }
 
 object Coroutines {
