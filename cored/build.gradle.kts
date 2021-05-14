@@ -14,18 +14,6 @@ group = Publishing.groupId
 val gitSha = "git rev-parse --short HEAD".runCommand(project.rootDir)?.trim().orEmpty()
 version = if (isReleaseBuild) Publishing.version else "main-$gitSha-SNAPSHOT"
 
-// this is workaround to make it work with Kotlin 1.4, it will not be needed anymore in Kotlin 1.5
-android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
-
 kotlin {
     android {
         publishLibraryVariants("release", "debug")
