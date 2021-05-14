@@ -316,7 +316,7 @@ class ReduxTest {
 
     @Test
     fun `should able to use combine reducer as usual reducer`() {
-        val localReducer = AnyReducer<CounterState> { currentState, action ->
+        val localReducer = AnyReducer { currentState: CounterState, action ->
             when (action) {
                 is Multiply -> currentState.copy(counter = currentState.counter * action.by)
                 is Divide -> currentState.copy(counter = currentState.counter / action.by)

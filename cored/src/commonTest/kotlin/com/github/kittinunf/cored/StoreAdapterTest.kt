@@ -185,7 +185,7 @@ class StoreAdapterTest {
     @Test
     fun `should invoke middleware in the correct order`() {
         val middlewares = mapOf(
-            "inc" to Middleware<CounterState, Increment> { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+            "inc" to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
                 if (order == Order.BeforeReduce) {
                     assertEquals(0, state.counter)
                 } else {
@@ -231,7 +231,7 @@ class StoreAdapterTest {
     @Test
     fun `should be able to dispatch action from the middleware`() {
         val middlewares = mapOf(
-            "inc" to Middleware<CounterState, Increment> { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+            "inc" to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
                 if (order == Order.AfterReduced) {
                     if (state.counter == 100) {
                         // dispatch another action from middleware
