@@ -10,15 +10,16 @@ supported (https://kotlinlang.org/docs/mpp-intro.html)
 
 ## Features
 
-CoRed is an opinionated way to setup the Redux implementation. Why we need CoRed? Redux is an amazing state management
-tool. However, some might find it to be too complicated or hard to use/understand, because the plain
-vanilla Redux-like implementation is quite boilerplate-y. There is an even
+CoRed is an opinionated way to setup the Redux implementation. Why we need CoRed? Redux is an
+amazing state management tool. However, some might find it to be too complicated or hard to
+use/understand, because the plain vanilla Redux-like implementation is quite boilerplate-y. There is
+an even
 [page](https://redux.js.org/recipes/reducing-boilerplate/) from the official Redux.js on how to
-reduce the boilerplate. That's why we develop CoRed. 
+reduce the boilerplate. That's why we develop CoRed.
 
-In CoRed's implementation, we are trying to solve the same problem with original Redux by introducing the more friendly
-API, then translating that into Kotlin in order to be a bit more accessible to mobile dev to use in
-their projects.
+In CoRed's implementation, we are trying to solve the same problem with original Redux by
+introducing the more friendly API, then translating that into Kotlin in order to be a bit more
+accessible to mobile dev to use in their projects.
 
 ## Installation
 
@@ -78,14 +79,13 @@ val store = createStore(
     ),
     middlewares = mapOf(
         "Load" to Middleware { order: Order, store: Store, state: CommentsState, action: Load ->
-                if (order == Order.AfterReduced) {
-                    scope.launch {
-                        val result = repository.getComments()
-                        if (result.isSuccess) {
-                            store.dispatch(SetComments(result.value))
-                        } else {
-                            store.dispatch(SetComments(null))
-                        }
+            if (order == Order.AfterReduced) {
+                scope.launch {
+                    val result = repository.getComments()
+                    if (result.isSuccess) {
+                        store.dispatch(SetComments(result.value))
+                    } else {
+                        store.dispatch(SetComments(null))
                     }
                 }
             }
