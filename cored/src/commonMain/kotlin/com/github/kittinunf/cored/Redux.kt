@@ -31,18 +31,14 @@ enum class Order {
     AfterReduced
 }
 
-typealias AnyMiddleware<S, E> = Middleware<S, Any, E>
+typealias AnyMiddleware<S> = Middleware<S, Any>
 
-interface Middleware<S : State, in A : Any, E : Environment> {
+fun interface Middleware<S : State, in A : Any> {
 
-    val environment: E
-
-    fun process(order: Order, store: StoreType<S, E>, state: S, action: A) {}
+    operator fun invoke(order: Order, store: StoreType<S>, state: S, action: A)
 }
 
-interface Environment
-
-interface StoreType<S : State, E : Environment> {
+interface StoreType<S : State> {
 
     val states: StateFlow<S>
 
@@ -54,55 +50,59 @@ interface StoreType<S : State, E : Environment> {
 
     suspend fun dispatch(actions: Flow<Any>)
 
-    fun addMiddleware(middleware: AnyMiddleware<S, E>)
+    fun addMiddleware(middleware: AnyMiddleware<S>)
 
-    fun removeMiddleware(middleware: AnyMiddleware<S, E>): Boolean
+    fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
 }
 
-fun <S : State> createStore(
+@Suppress("FunctionName")
+fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducer: AnyReducer<S>,
-): StoreType<S, Nothing> = Store(scope, initialState, DefaultEngine(reducer, mutableListOf()))
+): StoreType<S> = Store(scope, initialState, DefaultEngine(reducer, mutableListOf()))
 
-fun <S : State, E : Environment> createStore(
+@Suppress("FunctionName")
+fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducer: AnyReducer<S>,
-    middleware: AnyMiddleware<S, E>
-): StoreType<S, E> {
+    middleware: AnyMiddleware<S>
+): StoreType<S> {
     return Store(scope, initialState, DefaultEngine(reducer, mutableListOf(middleware)))
 }
 
-fun <S : State, E : Environment> createStore(
+@Suppress("FunctionName")
+fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducer: AnyReducer<S>,
-    vararg middlewares: AnyMiddleware<S, E>
-): StoreType<S, E> {
+    vararg middlewares: AnyMiddleware<S>
+): StoreType<S> {
     return Store(scope, initialState, DefaultEngine(reducer, middlewares.toMutableList()))
 }
 
-interface StateScannerEngine<S : State, E : Environment> {
+interface StateScannerEngine<S : State> {
 
     val reducer: AnyReducer<S>
-    val middlewares: MutableList<AnyMiddleware<S, E>>
+    val middlewares: MutableList<AnyMiddleware<S>>
 
-    suspend fun scan(storeType: StoreType<S, E>, state: S, action: Any): S
+    suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S
 }
 
-private class DefaultEngine<S : State, E : Environment>(override var reducer: AnyReducer<S>, override val middlewares: MutableList<AnyMiddleware<S, E>>) :
-    StateScannerEngine<S, E> {
+private class DefaultEngine<S : State>(override var reducer: AnyReducer<S>, override val middlewares: MutableList<AnyMiddleware<S>>) :
+    StateScannerEngine<S> {
 
-    override suspend fun scan(storeType: StoreType<S, E>, state: S, action: Any): S {
-        middlewares.onEach { it.process(Order.BeforeReduce, storeType, state, action) }
+    override suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S {
+        middlewares.onEach { it(Order.BeforeReduce, storeType, state, action) }
         val nextState = reducer(state, action)
-        middlewares.onEach { it.process(Order.AfterReduced, storeType, nextState, action) }
+        middlewares.onEach { it(Order.AfterReduced, storeType, nextState, action) }
         return nextState
     }
 }
 
-class Store<S : State, E : Environment> internal constructor(scope: CoroutineScope, initialState: S, val engine: StateScannerEngine<S, E>) : StoreType<S, E> {
+class Store<S : State> internal constructor(scope: CoroutineScope, initialState: S, private val engine: StateScannerEngine<S>) : StoreType<S>,
+    StateScannerEngine<S> by engine {
 
     companion object {
         const val defaultBufferCapacity = 16
@@ -113,10 +113,13 @@ class Store<S : State, E : Environment> internal constructor(scope: CoroutineSco
 
     private val _actions = MutableSharedFlow<Any>(replay = 0, extraBufferCapacity = defaultBufferCapacity, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
-    override val states: StateFlow<S> = _actions.scan(initialState to NoAction as Any) { (state, _), action ->
-        val nextState = engine.scan(this, state, action)
-        nextState to action
-    }.map { it.first }.stateIn(scope, SharingStarted.Eagerly, initialState)
+    override val states: StateFlow<S> = _actions
+        .scan(initialState to NoAction as Any) { (state, _), action ->
+            val nextState = scan(this, state, action)
+            nextState to action
+        }
+        .map { it.first }
+        .stateIn(scope, SharingStarted.Eagerly, initialState)
 
     override val currentState: S
         get() = states.value
@@ -131,11 +134,11 @@ class Store<S : State, E : Environment> internal constructor(scope: CoroutineSco
         actions.collect(_actions::emit)
     }
 
-    override fun addMiddleware(middleware: AnyMiddleware<S, E>) {
+    override fun addMiddleware(middleware: AnyMiddleware<S>) {
         engine.middlewares.add(middleware)
     }
 
-    override fun removeMiddleware(middleware: AnyMiddleware<S, E>): Boolean = engine.middlewares.remove(middleware)
+    override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean = engine.middlewares.remove(middleware)
 }
 
 fun <S : State> combineReducers(reducers: List<AnyReducer<S>>): AnyReducer<S> = CompositeReducer(reducers)
@@ -144,7 +147,5 @@ fun <S : State> combineReducers(vararg reducers: AnyReducer<S>): AnyReducer<S> =
 
 private class CompositeReducer<S : State>(private val reducers: List<AnyReducer<S>>) : AnyReducer<S> {
 
-    override operator fun invoke(currentState: S, action: Any): S = reducers.fold(currentState) { state, reducer ->
-        reducer(state, action)
-    }
+    override operator fun invoke(currentState: S, action: Any): S = reducers.fold(currentState) { state, reducer -> reducer(state, action) }
 }
