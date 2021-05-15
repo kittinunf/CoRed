@@ -77,8 +77,7 @@ val store = createStore(
         }
     ),
     middlewares = mapOf(
-        "Load" to Middleware<CommentsState, Load, CommentRepository> {
-            override fun process(order: Order, store: Store, state: CommentsState, action: Load) {
+        "Load" to Middleware { order: Order, store: Store, state: CommentsState, action: Load ->
                 if (order == Order.AfterReduced) {
                     scope.launch {
                         val result = repository.getComments()
@@ -90,8 +89,6 @@ val store = createStore(
                     }
                 }
             }
-
-            override val environment: CommentRepository = repository
         }
     )
 )
