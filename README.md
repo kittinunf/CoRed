@@ -69,7 +69,7 @@ class SetComments(val comments: List<String>?) : Identifiable
 
 val repository: CommentRepository // get repository somewhere e.g. manually create, DI, or 3rd party library
 
-val store = createStore(
+val store = Store(
     scope = viewScope,
     initialState = CommentsState(),
     reducers = mapOf(
