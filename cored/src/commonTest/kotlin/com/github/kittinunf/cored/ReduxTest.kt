@@ -346,6 +346,58 @@ class ReduxTest {
             localStore.dispatch(Divide(5)) // 195/5 = 39
         }
     }
-}
 
-fun <T> Flow<T>.printDebug() = onEach { println(it) }
+    @Test
+    fun `should be able to support setStateReducer by try setting new state directly to the store`() {
+        runBlockingTest {
+            store.states
+                .withIndex()
+                .onEach { (index, state) ->
+                    when (index) {
+                        1 -> assertEquals(100, state.counter)
+                        2 -> assertEquals(99, state.counter)
+                        3 -> assertEquals(1000, state.counter)
+                        4 -> assertEquals(900, state.counter)
+                    }
+                }
+                .printDebug()
+                .launchIn(testScope)
+
+            store.dispatch(Increment(100))
+            store.dispatch(Decrement(1))
+
+            store.trySetState {
+                CounterState(1000)
+            }
+
+            store.dispatch(Decrement(100))
+        }
+    }
+
+    @Test
+    fun `should be able to support setStateReducer by setting new state directly to the store`() {
+        runBlockingTest {
+            store.states
+                .withIndex()
+                .onEach { (index, state) ->
+                    when (index) {
+                        1 -> assertEquals(100, state.counter)
+                        2 -> assertEquals(99, state.counter)
+                        3 -> assertEquals(1000, state.counter)
+                        4 -> assertEquals(900, state.counter)
+                    }
+                }
+                .printDebug()
+                .launchIn(testScope)
+
+            store.dispatch(Increment(100))
+            store.dispatch(Decrement(1))
+
+            store.setState {
+                CounterState(1000)
+            }
+
+            store.dispatch(Decrement(100))
+        }
+    }
+}

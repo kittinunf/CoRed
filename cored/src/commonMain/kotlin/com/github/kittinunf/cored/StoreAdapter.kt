@@ -12,13 +12,21 @@ interface Identifiable {
 typealias ReducerType<S, A> = Pair<String, Reducer<S, A>>
 typealias EffectType<S, A> = Pair<String, Middleware<S, A>>
 
+private object SetStateActionIdentifiable : Identifiable {
+    // prepend with 2 underscores so it won't collide with the client identifier string
+    override val identifier: String = "__SetState"
+}
+
+@Suppress("FunctionName")
+private fun <S : State> SetStateReducerType(): ReducerType<S, Any> = SetStateActionIdentifiable.identifier to SetStateReducer()
+
 @Suppress("FunctionName")
 fun <S : State, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducers: Map<String, Reducer<S, A>>
 ): StoreType<S> {
-    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine(reducers.toMutableMap(), mutableMapOf())))
+    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), mutableMapOf())))
 }
 
 @Suppress("FunctionName")
@@ -28,7 +36,7 @@ fun <S : State, A : Any> Store(
     reducers: Map<String, Reducer<S, A>>,
     middlewares: Map<String, Middleware<S, A>>
 ): StoreType<S> {
-    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine(reducers.toMutableMap(), middlewares.toMutableMap())))
+    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), middlewares.toMutableMap())))
 }
 
 private class StoreAdapterEngine<S : State, A : Any>(
@@ -37,7 +45,8 @@ private class StoreAdapterEngine<S : State, A : Any>(
 ) : StateScannerEngine<S> {
 
     override suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S {
-        val id = checkNotNull(action as? Identifiable)
+        // check whether it is identifiable or it is a SetStateAction
+        val id = if (action is SetStateAction<*>) SetStateActionIdentifiable else checkNotNull(action as? Identifiable)
 
         val middleware = middlewareMap[id.identifier]
         val reducer = reducerMap.getValue(id.identifier)
