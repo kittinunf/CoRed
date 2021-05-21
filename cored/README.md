@@ -70,7 +70,8 @@ to generate new state.
 The example of the counter app's reducer function should be something like;
 
 ```kotlin
-    private val counterReducer = object : Reducer<CounterState, CounterAction> {
+private val counterReducer = object : Reducer<CounterState, CounterAction> {
+
     override fun reduce(currentState: CounterState, action: CounterAction): CounterState {
         return when (action) {
             is Increment -> currentState.copy(counter = counter + action.by)
@@ -122,21 +123,17 @@ enum class Order {
 ```
 
 ```kotlin
-val saveToDBMiddleware = object : Middleware<CounterState, CounterAction, CounterEnvironment> {
-    override fun process(
-        order: Order,
-        store: StoreType<CounterState, CounterAction, CounterEnvironment>,
-        state: CounterState,
-        action: CounterAction
-    ) {
+val environment = // get your environment somewhere 
+
+val saveToDBMiddleware = object : Middleware<CounterState, CounterAction> {
+
+    override fun process(order: Order, store: StoreType<CounterState>, state: CounterState, action: CounterAction) {
         if (order == Order.BeforeReduce) {
             environment.prepareDB()
         } else {
             environment.saveDataToDB()
         }
     }
-
-    override val environment: CounterEnvironment = CounterEnvironment
 }
 ```
 
