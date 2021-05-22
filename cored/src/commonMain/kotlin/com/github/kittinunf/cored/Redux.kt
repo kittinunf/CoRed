@@ -50,9 +50,20 @@ interface StoreType<S : State> {
 
     suspend fun dispatch(actions: Flow<Any>)
 
+    fun trySetState(stateProducer: () -> S): Boolean
+
+    suspend fun setState(stateProducer: () -> S)
+
     fun addMiddleware(middleware: AnyMiddleware<S>)
 
     fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
+}
+
+internal class SetStateAction<S : State>(val newState: S)
+
+internal class SetStateReducer<S : State> : AnyReducer<S> {
+
+    override fun invoke(currentState: S, action: Any): S = (action as? SetStateAction<S>)?.newState ?: currentState
 }
 
 @Suppress("FunctionName")
@@ -60,7 +71,7 @@ fun <S : State> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducer: AnyReducer<S>,
-): StoreType<S> = Store(scope, initialState, DefaultEngine(reducer, mutableListOf()))
+): StoreType<S> = Store(scope, initialState, DefaultEngine(combineReducers(reducer, SetStateReducer()), mutableListOf()))
 
 @Suppress("FunctionName")
 fun <S : State> Store(
@@ -69,7 +80,7 @@ fun <S : State> Store(
     reducer: AnyReducer<S>,
     middleware: AnyMiddleware<S>
 ): StoreType<S> {
-    return Store(scope, initialState, DefaultEngine(reducer, mutableListOf(middleware)))
+    return Store(scope, initialState, DefaultEngine(combineReducers(reducer, SetStateReducer()), mutableListOf(middleware)))
 }
 
 @Suppress("FunctionName")
@@ -79,7 +90,7 @@ fun <S : State> Store(
     reducer: AnyReducer<S>,
     vararg middlewares: AnyMiddleware<S>
 ): StoreType<S> {
-    return Store(scope, initialState, DefaultEngine(reducer, middlewares.toMutableList()))
+    return Store(scope, initialState, DefaultEngine(combineReducers(reducer, SetStateReducer()), middlewares.toMutableList()))
 }
 
 interface StateScannerEngine<S : State> {
@@ -119,10 +130,20 @@ class Store<S : State> internal constructor(scope: CoroutineScope, initialState:
             nextState to action
         }
         .map { it.first }
-        .stateIn(scope, SharingStarted.Eagerly, initialState)
+        .stateIn(scope, SharingStarted.Lazily, initialState)
 
     override val currentState: S
         get() = states.value
+
+    override fun trySetState(stateProducer: () -> S): Boolean {
+        val newState = stateProducer()
+        return _actions.tryEmit(SetStateAction(newState))
+    }
+
+    override suspend fun setState(stateProducer: () -> S) {
+        val newState = stateProducer()
+        _actions.emit(SetStateAction(newState))
+    }
 
     override suspend fun dispatch(action: Any) {
         _actions.emit(action)
