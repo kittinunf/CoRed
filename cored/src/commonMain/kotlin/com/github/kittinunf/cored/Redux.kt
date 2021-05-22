@@ -50,13 +50,13 @@ interface StoreType<S : State> {
 
     suspend fun dispatch(actions: Flow<Any>)
 
-    fun addMiddleware(middleware: AnyMiddleware<S>)
-
-    fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
-
     fun trySetState(stateProducer: () -> S): Boolean
 
     suspend fun setState(stateProducer: () -> S)
+
+    fun addMiddleware(middleware: AnyMiddleware<S>)
+
+    fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
 }
 
 internal class SetStateAction<S : State>(val newState: S)
@@ -130,7 +130,7 @@ class Store<S : State> internal constructor(scope: CoroutineScope, initialState:
             nextState to action
         }
         .map { it.first }
-        .stateIn(scope, SharingStarted.Eagerly, initialState)
+        .stateIn(scope, SharingStarted.Lazily, initialState)
 
     override val currentState: S
         get() = states.value
