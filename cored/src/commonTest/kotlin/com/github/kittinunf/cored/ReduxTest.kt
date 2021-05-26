@@ -25,7 +25,8 @@ class Decrement(val by: Int) : CounterAction(), Identifiable {
     override val identifier: String = "dec"
 }
 
-class Set(val value: Int) : CounterAction(), Identifiable
+// no need to implement Identifier if you don't want to customize it, by default it is class::simpleName
+class Set(val value: Int) : CounterAction()
 
 typealias CounterStore = StoreType<CounterState>
 

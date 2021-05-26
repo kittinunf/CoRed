@@ -6,7 +6,6 @@ import kotlinx.coroutines.GlobalScope
 interface Identifiable {
 
     val identifier: String
-        get() = this::class.simpleName!!
 }
 
 typealias ReducerType<S, A> = Pair<String, Reducer<S, A>>
@@ -46,10 +45,11 @@ private class StoreAdapterEngine<S : State, A : Any>(
 
     override suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S {
         // check whether it is identifiable or it is a SetStateAction
-        val id = if (action is SetStateAction<*>) SetStateActionIdentifiable else checkNotNull(action as? Identifiable)
+        val id = if (action is SetStateAction<*>) SetStateActionIdentifiable else action as? Identifiable
+        val identifier = id?.identifier ?: action::class.simpleName!!
 
-        val middleware = middlewareMap[id.identifier]
-        val reducer = reducerMap.getValue(id.identifier)
+        val middleware = middlewareMap[identifier]
+        val reducer = reducerMap.getValue(identifier)
 
         val typedAction = action as? A
 
