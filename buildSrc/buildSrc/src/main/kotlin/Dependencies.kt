@@ -12,7 +12,7 @@ object Android {
     const val targetSdkVersion = 30
     const val compileSdkVersion = 30
 
-    private const val version = "7.0.0-beta01"
+    private const val version = "7.0.0-beta03"
     const val plugin = "com.android.tools.build:gradle:$version"
 }
 
@@ -49,7 +49,7 @@ object Jacoco {
 object Publishing {
    
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.2.0"
+    const val version = "0.3.0"
 }
 
 object GradleNexus {
