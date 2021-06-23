@@ -1,9 +1,12 @@
 // Main libraries
 object Kotlin {
 
-    private const val version = "1.5.10"
+    private const val version = "1.5.31"
 
     const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
+
+    // apps
+    const val serializationPlugin = "org.jetbrains.kotlin:kotlin-serialization:$version"
 }
 
 object Android {
@@ -12,7 +15,7 @@ object Android {
     const val targetSdkVersion = 30
     const val compileSdkVersion = 30
 
-    private const val version = "7.0.0-rc01"
+    private const val version = "7.0.2"
     const val plugin = "com.android.tools.build:gradle:$version"
 }
 
@@ -25,7 +28,7 @@ object AndroidX {
 
 object Coroutines {
 
-    private const val version = "1.5.0-native-mt"
+    private const val version = "1.5.2-native-mt"
 
     const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -42,12 +45,12 @@ object JUnit {
 }
 
 object Jacoco {
-    const val version = "0.8.7"
+    const val version = "0.8.8"
 }
 
 // Publishing libraries
 object Publishing {
-   
+
     const val groupId = "com.github.kittinunf.cored"
     const val version = "0.5.1"
 }
