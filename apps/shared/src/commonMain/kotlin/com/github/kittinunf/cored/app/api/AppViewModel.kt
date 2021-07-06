@@ -4,7 +4,7 @@ import com.github.kittinunf.cored.StoreType
 import com.github.kittinunf.cored.app.repository.UserRepositoryImpl
 import kotlinx.coroutines.CoroutineScope
 
-class AppViewModel(scope: CoroutineScope) {
+class AppViewModel(private val scope: CoroutineScope) {
 
     private val store: StoreType<AppState> by lazy { AppStore(scope, UserRepositoryImpl()) }
 

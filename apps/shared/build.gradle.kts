@@ -6,7 +6,7 @@ plugins {
 
 kotlin {
     android()
-    ios { // comment/uncomment this for building both the arm64 + x64 framework
+    ios {
         binaries {
             framework {
                 baseName = "CoRed"

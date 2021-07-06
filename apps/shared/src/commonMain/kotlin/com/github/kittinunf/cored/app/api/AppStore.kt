@@ -6,7 +6,6 @@ import com.github.kittinunf.cored.Reducer
 import com.github.kittinunf.cored.ReducerType
 import com.github.kittinunf.cored.Store
 import com.github.kittinunf.cored.app.repository.UserRepository
-import com.github.kittinunf.cored.app.repository.UserRepositoryImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
