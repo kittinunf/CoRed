@@ -64,8 +64,8 @@ Redux with CoRed implementation (the setup part should be under 35~ lines)
 ```kotlin
 class CommentsState(val comments: List<String>? = null) : State
 
-object Load : Identifiable
-class SetComments(val comments: List<String>?) : Identifiable
+object Load
+class SetComments(val comments: List<String>?)
 
 val repository: CommentRepository // get repository somewhere e.g. manually create, DI, or 3rd party library
 
@@ -73,7 +73,7 @@ val store = Store(
     scope = viewScope,
     initialState = CommentsState(),
     reducers = mapOf(
-        "SetComments" to Reducer { currentState: CommentsState, action: SetComments ->
+        "SetComments" to Reducer { currentState: CommentsState, action: SetComments -> // This reducer is connected with SetComments action by using "SetComments" string as a Key
             currentState.copy(comments = action.comments)
         }
     ),
