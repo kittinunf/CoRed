@@ -17,10 +17,10 @@ private object SetStateActionIdentifiable : Identifiable {
 }
 
 @Suppress("FunctionName")
-private fun <S : State> SetStateReducerType(): ReducerType<S, Any> = SetStateActionIdentifiable.identifier to SetStateReducer()
+private fun <S : Any> SetStateReducerType(): ReducerType<S, Any> = SetStateActionIdentifiable.identifier to SetStateReducer()
 
 @Suppress("FunctionName")
-fun <S : State, A : Any> Store(
+fun <S : Any, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducers: Map<String, Reducer<S, A>>
@@ -29,7 +29,7 @@ fun <S : State, A : Any> Store(
 }
 
 @Suppress("FunctionName")
-fun <S : State, A : Any> Store(
+fun <S : Any, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducers: Map<String, Reducer<S, A>>,
@@ -38,7 +38,7 @@ fun <S : State, A : Any> Store(
     return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), middlewares.toMutableMap())))
 }
 
-private class StoreAdapterEngine<S : State, A : Any>(
+private class StoreAdapterEngine<S : Any, A : Any>(
     val reducerMap: MutableMap<String, Reducer<S, A>>,
     val middlewareMap: MutableMap<String, Middleware<S, A>>
 ) : StateScannerEngine<S> {
@@ -67,7 +67,7 @@ private class StoreAdapterEngine<S : State, A : Any>(
         get() = TODO("Not yet implemented")
 }
 
-private class StoreAdapter<S : State>(private val store: Store<S>) : StoreType<S> by store {
+private class StoreAdapter<S : Any>(private val store: Store<S>) : StoreType<S> by store {
 
     override fun addMiddleware(middleware: AnyMiddleware<S>) = error("Not supported yet")
 

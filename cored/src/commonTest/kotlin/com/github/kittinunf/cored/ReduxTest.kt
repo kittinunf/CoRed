@@ -13,7 +13,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-data class CounterState(val counter: Int = 0) : State
+data class CounterState(val counter: Int = 0)
 
 typealias CounterAction = Any
 
