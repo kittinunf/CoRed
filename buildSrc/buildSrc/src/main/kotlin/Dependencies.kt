@@ -49,7 +49,7 @@ object Jacoco {
 object Publishing {
    
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.3.0"
+    const val version = "0.4.0"
 }
 
 object GradleNexus {
