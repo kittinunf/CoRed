@@ -4,12 +4,14 @@ plugins {
     id("com.android.library")
 }
 
+private val artifactName = "CoRed"
+
 kotlin {
     android()
     ios {
         binaries {
             framework {
-                baseName = "CoRed"
+                baseName = artifactName
             }
         }
     }
@@ -88,8 +90,8 @@ android {
 
 tasks {
     fun getFrameworks(buildType: String): List<String> {
-        val arm64 = project.buildDir.resolve("bin/iosArm64/${buildType}Framework/HackerNews.framework").toString()
-        val x64 = project.buildDir.resolve("bin/iosx64/${buildType}Framework/HackerNews.framework").toString()
+        val arm64 = project.buildDir.resolve("bin/iosArm64/${buildType}Framework/$artifactName.framework").toString()
+        val x64 = project.buildDir.resolve("bin/iosx64/${buildType}Framework/$artifactName.framework").toString()
         return listOf(
             "-framework", arm64,
             "-debug-symbols", "$arm64.dSYM",

@@ -1,9 +1,8 @@
 package com.github.kittinunf.cored.app.api
 
-import com.github.kittinunf.cored.State
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(val id: Int, val name: String, val email: String)
 
-data class AppState(val isLoading: Boolean = false, val users: List<User>? = null) : State
+data class AppState(val isLoading: Boolean = false, val users: List<User>? = null)
