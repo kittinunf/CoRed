@@ -4,7 +4,7 @@ plugins {
     id("com.android.library")
 }
 
-private val artifactName = "CoRed"
+val artifactName = "CoRed"
 
 kotlin {
     android()
@@ -101,7 +101,7 @@ tasks {
     }
 
     fun getTaskCommand(buildType: String, outputDir: File): List<String> {
-        val name = "HackerNews-$buildType.xcframework"
+        val name = "$artifactName-$buildType.xcframework"
         return listOf("xcodebuild", "-create-xcframework") + getFrameworks(buildType) + listOf("-output", File("$outputDir/$name").toString())
     }
 
