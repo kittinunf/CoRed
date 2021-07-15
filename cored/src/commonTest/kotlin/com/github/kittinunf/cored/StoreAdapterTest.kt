@@ -18,10 +18,10 @@ class StoreAdapterTest {
 
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
     private val reducers = mapOf(
-        "inc" to Reducer { currentState: CounterState, action: Increment ->
+        Increment::class to Reducer { currentState: CounterState, action: Increment ->
             currentState.copy(counter = currentState.counter + action.by)
         },
-        "dec" to Reducer { currentState: CounterState, action: Decrement ->
+        Decrement::class to Reducer { currentState: CounterState, action: Decrement ->
             currentState.copy(counter = currentState.counter - action.by)
         }
     )
@@ -152,17 +152,15 @@ class StoreAdapterTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middlewares = mapOf(
-            "inc" to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+        val localStore = Store(testScope, CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
                 if (order == Order.BeforeReduce) {
                     assertEquals(0, state.counter)
                 } else {
                     sideEffectData.value = sideEffectData.value + state.counter
                 }
             }
-        )
-
-        val localStore = Store(testScope, CounterState(), reducers, middlewares)
+        ))
 
         runBlockingTest {
             localStore.states
@@ -184,17 +182,15 @@ class StoreAdapterTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val middlewares = mapOf(
-            "inc" to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+        val localStore = Store(testScope, CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
                 if (order == Order.BeforeReduce) {
                     assertEquals(0, state.counter)
                 } else {
                     assertEquals(100, state.counter)
                 }
             }
-        )
-
-        val localStore = Store(testScope, CounterState(), reducers, middlewares)
+        ))
 
         runBlockingTest {
             localStore.states
@@ -208,13 +204,11 @@ class StoreAdapterTest {
 
     @Test
     fun `should invoke even we don't provide the customization on the identifier with the qualified name`() {
-        val reducers = mapOf(
-            "Set" to Reducer { currentState: CounterState, action: Set ->
+        val localStore = Store(testScope, CounterState(), mapOf(
+            Set::class to Reducer { currentState: CounterState, action: Set ->
                 currentState.copy(counter = action.value)
             }
-        )
-
-        val localStore = Store(testScope, CounterState(), reducers)
+        ))
 
         runBlockingTest {
             localStore.states
@@ -230,8 +224,8 @@ class StoreAdapterTest {
 
     @Test
     fun `should be able to dispatch action from the middleware`() {
-        val middlewares = mapOf(
-            "inc" to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+        val localStore = Store(testScope, CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
                 if (order == Order.AfterReduced) {
                     if (state.counter == 100) {
                         // dispatch another action from middleware
@@ -243,9 +237,7 @@ class StoreAdapterTest {
                     }
                 }
             }
-        )
-
-        val localStore = Store(testScope, CounterState(), reducers, middlewares)
+        ))
 
         runBlockingTest {
             localStore.states

@@ -62,8 +62,10 @@ interface CommentRepository {
 Redux with CoRed implementation (the setup part should be under 35~ lines)
 
 ```kotlin
-class CommentsState(val comments: List<String>? = null) : State
+// State definition for you application
+class CommentsState(val comments: List<String>? = null)
 
+// Actions
 object Load
 class SetComments(val comments: List<String>?)
 
@@ -73,12 +75,12 @@ val store = Store(
     scope = viewScope,
     initialState = CommentsState(),
     reducers = mapOf(
-        "SetComments" to Reducer { currentState: CommentsState, action: SetComments -> // This reducer is connected with SetComments action by using "SetComments" string as a Key
+        SetComments::class to Reducer { currentState: CommentsState, action: SetComments -> // This reducer is connected with SetComments action by using SetComments::class as a Key
             currentState.copy(comments = action.comments)
         }
     ),
     middlewares = mapOf(
-        "Load" to Middleware { order: Order, store: Store, state: CommentsState, action: Load ->
+        Load::class to Middleware { order: Order, store: Store, state: CommentsState, action: Load -> // This middleware is connected with Load action by using Load::class as a Key
             if (order == Order.AfterReduced) {
                 scope.launch {
                     val result = repository.getComments()
