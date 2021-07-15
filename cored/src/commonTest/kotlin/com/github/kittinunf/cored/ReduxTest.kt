@@ -13,15 +13,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
+// State definition
 data class CounterState(val counter: Int = 0)
 
-typealias CounterAction = Any
-
-class Increment(val by: Int) : CounterAction()
-class Decrement(val by: Int) : CounterAction()
-
-// no need to implement Identifier if you don't want to customize it, by default it is class::simpleName
-class Set(val value: Int) : CounterAction()
+// Action definition
+class Increment(val by: Int)
+class Decrement(val by: Int)
+class Set(val value: Int)
 
 typealias CounterStore = StoreType<CounterState>
 
@@ -286,8 +284,8 @@ class ReduxTest {
         assertEquals(310, store.currentState.counter)
     }
 
-    class Multiply(val by: Int) : CounterAction()
-    class Divide(val by: Int) : CounterAction()
+    class Multiply(val by: Int)
+    class Divide(val by: Int)
 
     @Test
     fun `should ignore action that is not unknown with the current known action reducer`() {
