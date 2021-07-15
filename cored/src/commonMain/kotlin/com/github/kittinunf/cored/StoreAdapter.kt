@@ -2,28 +2,19 @@ package com.github.kittinunf.cored
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlin.reflect.KClass
 
-interface Identifiable {
-
-    val identifier: String
-}
-
-typealias ReducerType<S, A> = Pair<String, Reducer<S, A>>
-typealias EffectType<S, A> = Pair<String, Middleware<S, A>>
-
-private object SetStateActionIdentifiable : Identifiable {
-    // prepend with 2 underscores so it won't collide with the client identifier string
-    override val identifier: String = "__SetState"
-}
+typealias ReducerType<S, A> = Pair<KClass<out Any>, Reducer<S, A>>
+typealias EffectType<S, A> = Pair<KClass<out Any>, Middleware<S, A>>
 
 @Suppress("FunctionName")
-private fun <S : Any> SetStateReducerType(): ReducerType<S, Any> = SetStateActionIdentifiable.identifier to SetStateReducer()
+private fun <S : Any> SetStateReducerType(): ReducerType<S, Any> = SetStateAction::class to SetStateReducer()
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
-    reducers: Map<String, Reducer<S, A>>
+    reducers: Map<KClass<out Any>, Reducer<S, A>>
 ): StoreType<S> {
     return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), mutableMapOf())))
 }
@@ -32,21 +23,19 @@ fun <S : Any, A : Any> Store(
 fun <S : Any, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
-    reducers: Map<String, Reducer<S, A>>,
-    middlewares: Map<String, Middleware<S, A>>
+    reducers: Map<KClass<out Any>, Reducer<S, A>>,
+    middlewares: Map<KClass<out Any>, Middleware<S, A>>
 ): StoreType<S> {
     return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), middlewares.toMutableMap())))
 }
 
 private class StoreAdapterEngine<S : Any, A : Any>(
-    val reducerMap: MutableMap<String, Reducer<S, A>>,
-    val middlewareMap: MutableMap<String, Middleware<S, A>>
+    val reducerMap: MutableMap<KClass<out Any>, Reducer<S, A>>,
+    val middlewareMap: MutableMap<KClass<out Any>, Middleware<S, A>>
 ) : StateScannerEngine<S> {
 
     override suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S {
-        // check whether it is identifiable or it is a SetStateAction
-        val id = if (action is SetStateAction<*>) SetStateActionIdentifiable else action as? Identifiable
-        val identifier = id?.identifier ?: action::class.simpleName!!
+        val identifier = action::class
 
         val middleware = middlewareMap[identifier]
         val reducer = reducerMap.getValue(identifier)

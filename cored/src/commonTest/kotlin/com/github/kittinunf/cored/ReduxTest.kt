@@ -17,13 +17,8 @@ data class CounterState(val counter: Int = 0)
 
 typealias CounterAction = Any
 
-class Increment(val by: Int) : CounterAction(), Identifiable {
-    override val identifier: String = "inc"
-}
-
-class Decrement(val by: Int) : CounterAction(), Identifiable {
-    override val identifier: String = "dec"
-}
+class Increment(val by: Int) : CounterAction()
+class Decrement(val by: Int) : CounterAction()
 
 // no need to implement Identifier if you don't want to customize it, by default it is class::simpleName
 class Set(val value: Int) : CounterAction()
