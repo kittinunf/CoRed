@@ -12,7 +12,7 @@ object Android {
     const val targetSdkVersion = 30
     const val compileSdkVersion = 30
 
-    private const val version = "7.0.0-beta03"
+    private const val version = "7.0.0-rc01"
     const val plugin = "com.android.tools.build:gradle:$version"
 }
 
@@ -25,7 +25,7 @@ object AndroidX {
 
 object Coroutines {
 
-    private const val version = "1.5.0-RC-native-mt"
+    private const val version = "1.5.0-native-mt"
 
     const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -49,7 +49,7 @@ object Jacoco {
 object Publishing {
    
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.4.0"
+    const val version = "0.5.1"
 }
 
 object GradleNexus {
