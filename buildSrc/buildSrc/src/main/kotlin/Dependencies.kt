@@ -1,7 +1,7 @@
 // Main libraries
 object Kotlin {
 
-    private const val version = "1.5.0"
+    private const val version = "1.5.10"
 
     const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
 }
