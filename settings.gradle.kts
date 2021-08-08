@@ -11,3 +11,5 @@ pluginManagement {
 includeBuild("plugins")
 
 include(":cored")
+include("apps:android")
+include("apps:shared")

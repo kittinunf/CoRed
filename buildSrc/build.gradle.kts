@@ -21,4 +21,7 @@ dependencies {
     // plugins
     implementation(Android.plugin)
     implementation(JUnit.pluginJacoco)
+
+    // app
+    implementation("com.squareup.sqldelight:gradle-plugin:1.5.0")
 }

@@ -1,0 +1,23 @@
+CREATE TABLE TipJar (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount INTEGER NOT NULL,
+    peopleCount INTEGER NOT NULL,
+    tipAmount INTEGER NOT NULL,
+    imageLocation TEXT,
+    time INTEGER NOT NULL
+);
+
+insertTip:
+INSERT INTO TipJar (amount, peopleCount, tipAmount, imageLocation, time) VALUES (?, ?,?, ?, ?);
+
+selectTips:
+SELECT * FROM TipJar;
+
+selectTipsDesc:
+SELECT * FROM TipJar ORDER BY time DESC;
+
+deleteTip:
+DELETE FROM TipJar WHERE id = ?;
+
+deleteAllTips:
+DELETE FROM TipJar;
