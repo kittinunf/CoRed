@@ -54,7 +54,6 @@ fun TipJarListScreen() {
     val vm = remember { getInstance<TipJarListViewModel>() }
     val states by vm.states.collectAsState(rememberCoroutineScope().coroutineContext)
 
-    val context = LocalContext.current
     var dialogState by remember { mutableStateOf<DialogState>(DialogState.NotShown) }
 
     LaunchedEffect(Unit) { vm.loadTips() }
@@ -67,6 +66,7 @@ fun TipJarListScreen() {
     when (val state = dialogState) {
         is DialogState.Show -> {
             if (state.value.image == null) {
+                val context = LocalContext.current
                 Toast.makeText(context, "We don't have image for that tip record.", Toast.LENGTH_SHORT).show()
                 dialogState = DialogState.NotShown
             } else {
@@ -132,7 +132,6 @@ fun RowComponent(state: ListUiItemState, onClick: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DialogComponent(state: ListUiItemState, onDismiss: () -> Unit) {
     var _bitmap by remember(key1 = state.id) { mutableStateOf<ImageBitmap?>(null) }
