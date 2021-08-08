@@ -1,6 +1,7 @@
 package com.github.kittinunf.app.tipjar.screen
 
 import android.graphics.BitmapFactory
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -52,6 +54,7 @@ fun TipJarListScreen() {
     val vm = remember { getInstance<TipJarListViewModel>() }
     val states by vm.states.collectAsState(rememberCoroutineScope().coroutineContext)
 
+    val context = LocalContext.current
     var dialogState by remember { mutableStateOf<DialogState>(DialogState.NotShown) }
 
     LaunchedEffect(Unit) { vm.loadTips() }
@@ -63,8 +66,13 @@ fun TipJarListScreen() {
 
     when (val state = dialogState) {
         is DialogState.Show -> {
-            DialogComponent(state = state.value) {
+            if (state.value.image == null) {
+                Toast.makeText(context, "We don't have image for that tip record.", Toast.LENGTH_SHORT).show()
                 dialogState = DialogState.NotShown
+            } else {
+                DialogComponent(state = state.value) {
+                    dialogState = DialogState.NotShown
+                }
             }
         }
         else -> {
