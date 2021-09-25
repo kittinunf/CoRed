@@ -8,6 +8,8 @@ pluginManagement {
     }
 }
 
-includeBuild("plugins")
-
 include(":cored")
+include(":apps:shared")
+
+// plugins
+includeBuild("plugins")

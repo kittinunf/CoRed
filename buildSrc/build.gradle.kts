@@ -21,4 +21,7 @@ dependencies {
     // plugins
     implementation(Android.plugin)
     implementation(JUnit.pluginJacoco)
+
+    // apps
+    implementation(Kotlin.serializationPlugin)
 }

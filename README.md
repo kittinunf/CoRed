@@ -28,20 +28,16 @@ Add mavenCentral into your dependencies' repositories configuration
 ```kotlin
 repositories {
     mavenCentral()
-    // ...
+}
+
+dependencies {
+    // if you are working on JVM or Android only project
+    implementation("com.github.kittinunf.cored:cored-jvm:«version»") //for JVM support
+
+    // if you are working in KMM project
+    implementation("com.github.kittinunf.cored:cored:«version»") //for Kotlin Multiplatform support
 }
 ```
-
-Then, just add the dependency to your `commonMain` dependencies
-
-```kotlin
-commonMain {
-    dependencies {
-        // ...
-        implementation("com.github.kittinunf.cored:cored:«version»")
-    }
-}
-``` 
 
 ## How to set this up?
 
@@ -63,7 +59,7 @@ Redux with CoRed implementation (the setup part should be under 35~ lines)
 
 ```kotlin
 // State definition for you application
-class CommentsState(val comments: List<String>? = null)
+class CommentsState(val isLoading: Boolean, val comments: List<String>? = null)
 
 // Actions
 object Load
@@ -80,15 +76,14 @@ val store = Store(
         }
     ),
     middlewares = mapOf(
-        Load::class to Middleware { order: Order, store: Store, state: CommentsState, action: Load -> // This middleware is connected with Load action by using Load::class as a Key
-            if (order == Order.AfterReduced) {
-                scope.launch {
-                    val result = repository.getComments()
-                    if (result.isSuccess) {
-                        store.dispatch(SetComments(result.value))
-                    } else {
-                        store.dispatch(SetComments(null))
-                    }
+        Load::class to Middleware { _: Order, store: Store, state: CommentsState, _: Load -> // This middleware is connected with Load action by using Load::class as a Key
+            if (state.isLoading) return@Middleware
+            scope.launch {
+                val result = repository.getComments()
+                if (result.isSuccess) {
+                    store.dispatch(SetComments(result.value))
+                } else {
+                    store.dispatch(SetComments(null))
                 }
             }
         }
