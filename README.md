@@ -28,20 +28,16 @@ Add mavenCentral into your dependencies' repositories configuration
 ```kotlin
 repositories {
     mavenCentral()
-    // ...
+}
+
+dependencies {
+    // if you are working on JVM or Android only project
+    implementation("com.github.kittinunf.cored:cored-jvm:«version»") //for JVM support
+
+    // if you are working in KMM project
+    implementation("com.github.kittinunf.cored:cored:«version»") //for Kotlin Multiplatform support
 }
 ```
-
-Then, just add the dependency to your `commonMain` dependencies
-
-```kotlin
-commonMain {
-    dependencies {
-        // ...
-        implementation("com.github.kittinunf.cored:cored:«version»")
-    }
-}
-``` 
 
 ## How to set this up?
 
