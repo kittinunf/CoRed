@@ -26,10 +26,10 @@ kotlin {
                 api(project(":cored"))
 
                 implementation(Coroutines.core)
-                implementation("io.ktor:ktor-client-core:1.6.0")
-                implementation("io.ktor:ktor-client-serialization:1.6.0")
+                implementation("io.ktor:ktor-client-core:1.6.3")
+                implementation("io.ktor:ktor-client-serialization:1.6.3")
 
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0-RC")
             }
         }
 
@@ -41,7 +41,7 @@ kotlin {
 
         val androidMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-okhttp:1.6.0")
+                implementation("io.ktor:ktor-client-okhttp:1.6.3")
             }
         }
 
@@ -53,7 +53,7 @@ kotlin {
 
         val iosMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-ios:1.6.0")
+                implementation("io.ktor:ktor-client-ios:1.6.3")
             }
         }
     }
@@ -92,12 +92,7 @@ tasks {
     fun getFrameworks(buildType: String): List<String> {
         val arm64 = project.buildDir.resolve("bin/iosArm64/${buildType}Framework/$artifactName.framework").toString()
         val x64 = project.buildDir.resolve("bin/iosx64/${buildType}Framework/$artifactName.framework").toString()
-        return listOf(
-            "-framework", arm64,
-            "-debug-symbols", "$arm64.dSYM",
-            "-framework", x64,
-            "-debug-symbols", "$x64.dSYM"
-        )
+        return listOf("-framework", arm64, "-debug-symbols", "$arm64.dSYM", "-framework", x64, "-debug-symbols", "$x64.dSYM")
     }
 
     fun getTaskCommand(buildType: String, outputDir: File): List<String> {
