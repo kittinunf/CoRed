@@ -63,7 +63,7 @@ Redux with CoRed implementation (the setup part should be under 35~ lines)
 
 ```kotlin
 // State definition for you application
-class CommentsState(val comments: List<String>? = null)
+class CommentsState(val isLoading: Boolean, val comments: List<String>? = null)
 
 // Actions
 object Load
@@ -80,15 +80,14 @@ val store = Store(
         }
     ),
     middlewares = mapOf(
-        Load::class to Middleware { order: Order, store: Store, state: CommentsState, action: Load -> // This middleware is connected with Load action by using Load::class as a Key
-            if (order == Order.AfterReduced) {
-                scope.launch {
-                    val result = repository.getComments()
-                    if (result.isSuccess) {
-                        store.dispatch(SetComments(result.value))
-                    } else {
-                        store.dispatch(SetComments(null))
-                    }
+        Load::class to Middleware { _: Order, store: Store, state: CommentsState, _: Load -> // This middleware is connected with Load action by using Load::class as a Key
+            if (state.isLoading) return@Middleware
+            scope.launch {
+                val result = repository.getComments()
+                if (result.isSuccess) {
+                    store.dispatch(SetComments(result.value))
+                } else {
+                    store.dispatch(SetComments(null))
                 }
             }
         }

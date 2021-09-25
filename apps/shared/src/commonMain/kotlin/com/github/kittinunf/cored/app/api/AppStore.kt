@@ -47,4 +47,3 @@ internal fun AppStore(scope: CoroutineScope, repository: UserRepository) =
         reducers = mapOf(LoadUserReducer(), SetUsersReducer()),
         middlewares = mapOf(LoadUserEffect(scope, repository))
     )
-
