@@ -54,10 +54,3 @@ object Publishing {
     const val groupId = "com.github.kittinunf.cored"
     const val version = "0.5.1"
 }
-
-object GradleNexus {
-
-    private const val version = "1.1.0"
-
-    const val pluginNexus = "io.github.gradle-nexus:publish-plugin:$version"
-}
