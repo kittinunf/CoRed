@@ -12,8 +12,8 @@ object Kotlin {
 object Android {
 
     const val minSdkVersion = 21
-    const val targetSdkVersion = 30
-    const val compileSdkVersion = 30
+    const val targetSdkVersion = 31
+    const val compileSdkVersion = 31
 
     private const val version = "7.0.2"
     const val plugin = "com.android.tools.build:gradle:$version"
