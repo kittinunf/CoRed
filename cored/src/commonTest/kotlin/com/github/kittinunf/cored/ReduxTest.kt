@@ -2,11 +2,11 @@ package com.github.kittinunf.cored
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -46,18 +46,18 @@ class ReduxTest {
 
     @Test
     fun `should increment state`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        0 -> assertEquals(0, state.counter)
-                        1 -> assertEquals(1, state.counter)
-                        2 -> assertEquals(3, state.counter)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            0 -> assertEquals(0, state.counter)
+                            1 -> assertEquals(1, state.counter)
+                            2 -> assertEquals(3, state.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(1))
             store.dispatch(Increment(2))
@@ -66,19 +66,19 @@ class ReduxTest {
 
     @Test
     fun `should decrement state`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        0 -> assertEquals(0, state.counter)
-                        1 -> assertEquals(-2, state.counter)
-                        2 -> assertEquals(-5, state.counter)
-                        3 -> assertEquals(-10, state.counter)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            0 -> assertEquals(0, state.counter)
+                            1 -> assertEquals(-2, state.counter)
+                            2 -> assertEquals(-5, state.counter)
+                            3 -> assertEquals(-10, state.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Decrement(2))
             store.dispatch(Decrement(3))
@@ -88,31 +88,31 @@ class ReduxTest {
 
     @Test
     fun `should emit initial value`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    assertEquals(0, index)
-                    assertEquals(0, state.counter)
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        assertEquals(0, index)
+                        assertEquals(0, state.counter)
+                    }
+                    .printDebug()
+                    .launchIn(testScope)
         }
     }
 
     @Test
     fun `should emit value if the state not changed`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        0 -> assertEquals(0, state.counter)
-                        else -> fail("should not reach here")
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            0 -> assertEquals(0, state.counter)
+                            else -> fail("should not reach here")
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(0))
             store.dispatch(Decrement(0))
@@ -121,18 +121,18 @@ class ReduxTest {
 
     @Test
     fun `should not emit same value up until the same state is emitted`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        0 -> assertEquals(0, state.counter)
-                        1 -> assertEquals(1, state.counter)
-                        else -> fail("should not reach here")
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            0 -> assertEquals(0, state.counter)
+                            1 -> assertEquals(1, state.counter)
+                            else -> fail("should not reach here")
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(1))
             store.dispatch(Decrement(0))
@@ -142,16 +142,16 @@ class ReduxTest {
 
     @Test
     fun `should dispatch multiple value from Flow emitter block`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        4 -> assertEquals(0, state.counter)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            4 -> assertEquals(0, state.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(flow {
                 emit(Increment(10))
@@ -179,11 +179,11 @@ class ReduxTest {
 
         store.addMiddleware(middleware)
 
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .printDebug()
-                .launchIn(testScope)
+                    .withIndex()
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
         }
@@ -208,11 +208,11 @@ class ReduxTest {
 
         store.addMiddleware(middleware)
 
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .printDebug()
-                .launchIn(testScope)
+                    .withIndex()
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
         }
@@ -221,7 +221,7 @@ class ReduxTest {
 
         store.removeMiddleware(middleware)
 
-        runBlockingTest {
+        runTest {
             store.dispatch(Increment(100))
             store.dispatch(Decrement(100))
         }
@@ -243,11 +243,11 @@ class ReduxTest {
 
         store.addMiddleware(middleware)
 
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .printDebug()
-                .launchIn(testScope)
+                    .withIndex()
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
         }
@@ -262,7 +262,7 @@ class ReduxTest {
                 assertTrue(action is Increment)
                 if (state.counter == 100) {
                     // dispatch another action from middleware
-                    runBlockingTest {
+                    runTest {
                         store.dispatch(Increment(10))
                     }
                     store.tryDispatch(Increment(200))
@@ -272,11 +272,11 @@ class ReduxTest {
 
         store.addMiddleware(middleware)
 
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .printDebug()
-                .launchIn(testScope)
+                    .withIndex()
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
         }
@@ -289,17 +289,17 @@ class ReduxTest {
 
     @Test
     fun `should ignore action that is not unknown with the current known action reducer`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        1 -> assertEquals(100, state.counter)
-                        2 -> assertEquals(99, state.counter)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            1 -> assertEquals(100, state.counter)
+                            2 -> assertEquals(99, state.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
             store.dispatch(Multiply(10))
@@ -320,19 +320,19 @@ class ReduxTest {
 
         val localStore = Store(testScope, counterState, combineReducers(localReducer, counterReducer))
 
-        runBlockingTest {
+        runTest {
             localStore.states
-                .withIndex()
-                .onEach { (index, value) ->
-                    when (index) {
-                        1 -> assertEquals(10, value.counter)
-                        2 -> assertEquals(200, value.counter)
-                        3 -> assertEquals(195, value.counter)
-                        4 -> assertEquals(39, value.counter)
+                    .withIndex()
+                    .onEach { (index, value) ->
+                        when (index) {
+                            1 -> assertEquals(10, value.counter)
+                            2 -> assertEquals(200, value.counter)
+                            3 -> assertEquals(195, value.counter)
+                            4 -> assertEquals(39, value.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             localStore.dispatch(Increment(10))
             localStore.dispatch(Multiply(20)) // 10 * 20
@@ -343,19 +343,19 @@ class ReduxTest {
 
     @Test
     fun `should be able to support setStateReducer by try setting new state directly to the store`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        1 -> assertEquals(100, state.counter)
-                        2 -> assertEquals(99, state.counter)
-                        3 -> assertEquals(1000, state.counter)
-                        4 -> assertEquals(900, state.counter)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            1 -> assertEquals(100, state.counter)
+                            2 -> assertEquals(99, state.counter)
+                            3 -> assertEquals(1000, state.counter)
+                            4 -> assertEquals(900, state.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
             store.dispatch(Decrement(1))
@@ -370,19 +370,19 @@ class ReduxTest {
 
     @Test
     fun `should be able to support setStateReducer by setting new state directly to the store`() {
-        runBlockingTest {
+        runTest {
             store.states
-                .withIndex()
-                .onEach { (index, state) ->
-                    when (index) {
-                        1 -> assertEquals(100, state.counter)
-                        2 -> assertEquals(99, state.counter)
-                        3 -> assertEquals(1000, state.counter)
-                        4 -> assertEquals(900, state.counter)
+                    .withIndex()
+                    .onEach { (index, state) ->
+                        when (index) {
+                            1 -> assertEquals(100, state.counter)
+                            2 -> assertEquals(99, state.counter)
+                            3 -> assertEquals(1000, state.counter)
+                            4 -> assertEquals(900, state.counter)
+                        }
                     }
-                }
-                .printDebug()
-                .launchIn(testScope)
+                    .printDebug()
+                    .launchIn(testScope)
 
             store.dispatch(Increment(100))
             store.dispatch(Decrement(1))

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,7 +31,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should increment state`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -50,7 +51,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should decrement state`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -72,7 +73,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should emit initial value`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -86,7 +87,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should not emit value if the state not changed`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -105,7 +106,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should not emit same value up until the same state is emitted`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -126,7 +127,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should dispatch multiple value from Flow emitter block`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -162,7 +163,7 @@ class StoreAdapterTest {
             }
         ))
 
-        runBlockingTest {
+        runTest {
             localStore.states
                 .withIndex()
                 .printDebug()
@@ -192,7 +193,7 @@ class StoreAdapterTest {
             }
         ))
 
-        runBlockingTest {
+        runTest {
             localStore.states
                 .withIndex()
                 .printDebug()
@@ -210,7 +211,7 @@ class StoreAdapterTest {
             }
         ))
 
-        runBlockingTest {
+        runTest {
             localStore.states
                 .withIndex()
                 .printDebug()
@@ -229,7 +230,7 @@ class StoreAdapterTest {
                 if (order == Order.AfterReduced) {
                     if (state.counter == 100) {
                         // dispatch another action from middleware
-                        runBlockingTest {
+                        runTest {
                             delay(1000)
                             store.dispatch(Increment(10))
                         }
@@ -239,7 +240,7 @@ class StoreAdapterTest {
             }
         ))
 
-        runBlockingTest {
+        runTest {
             localStore.states
                 .withIndex()
                 .printDebug()
@@ -253,7 +254,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should be able to support setStateReducer by try setting new state directly to the store`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->
@@ -280,7 +281,7 @@ class StoreAdapterTest {
 
     @Test
     fun `should be able to support setStateReducer by setting new state directly to the store`() {
-        runBlockingTest {
+        runTest {
             store.states
                 .withIndex()
                 .onEach { (index, state) ->

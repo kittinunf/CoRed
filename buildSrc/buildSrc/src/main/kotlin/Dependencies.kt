@@ -15,7 +15,7 @@ object Android {
     const val targetSdkVersion = 31
     const val compileSdkVersion = 31
 
-    private const val version = "7.0.2"
+    private const val version = "7.0.4"
     const val plugin = "com.android.tools.build:gradle:$version"
 }
 

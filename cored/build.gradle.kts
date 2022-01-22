@@ -45,16 +45,13 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(Coroutines.test)
             }
         }
 
         val androidMain by getting {}
 
-        val androidTest by getting {
-            dependencies {
-                implementation(Coroutines.test)
-            }
-        }
+        val androidTest by getting {}
 
         val iosMain by getting {}
 
