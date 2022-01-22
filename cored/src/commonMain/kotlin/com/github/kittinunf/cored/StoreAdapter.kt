@@ -53,12 +53,15 @@ private class StoreAdapterEngine<S : Any, A : Any>(
     override val reducer: AnyReducer<S> = combineReducers(reducerMap.values.toList() as List<AnyReducer<S>>)
 
     override val middlewares: MutableList<AnyMiddleware<S>>
-        get() = TODO("Not yet implemented")
+        get() = middlewareMap.values.toMutableList() as MutableList<AnyMiddleware<S>>
+
+    override fun addMiddleware(action: Any, middleware: AnyMiddleware<S>) {
+        middlewareMap.put(action::class, middleware)
+    }
+
+    override fun removeMiddleware(action: Any, middleware: AnyMiddleware<S>): Boolean {
+        return middlewareMap.remove(action::class) != null
+    }
 }
 
-private class StoreAdapter<S : Any>(private val store: Store<S>) : StoreType<S> by store {
-
-    override fun addMiddleware(middleware: AnyMiddleware<S>) = error("Not supported yet")
-
-    override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean = error("Not supported yet")
-}
+private class StoreAdapter<S : Any>(private val store: Store<S>) : StoreType<S> by store

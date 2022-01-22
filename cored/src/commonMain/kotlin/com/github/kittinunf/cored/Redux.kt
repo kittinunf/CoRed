@@ -52,9 +52,13 @@ interface StoreType<S : Any> {
 
     suspend fun setState(stateProducer: () -> S)
 
-    fun addMiddleware(middleware: AnyMiddleware<S>)
+    fun addMiddleware(action: Any, middleware: AnyMiddleware<S>)
 
-    fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
+    fun removeMiddleware(action: Any, middleware: AnyMiddleware<S>): Boolean
+
+    fun addMiddleware(middleware: AnyMiddleware<S>) = addMiddleware(Any(), middleware)
+
+    fun removeMiddleware(middleware: AnyMiddleware<S>) = removeMiddleware(Any(), middleware)
 }
 
 internal class SetStateAction<S : Any>(val newState: S)
@@ -97,6 +101,10 @@ interface StateScannerEngine<S : Any> {
     val middlewares: MutableList<AnyMiddleware<S>>
 
     suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S
+
+    fun addMiddleware(action: Any, middleware: AnyMiddleware<S>)
+
+    fun removeMiddleware(action: Any, middleware: AnyMiddleware<S>): Boolean
 }
 
 private class DefaultEngine<S : Any>(override var reducer: AnyReducer<S>, override val middlewares: MutableList<AnyMiddleware<S>>) :
@@ -108,6 +116,12 @@ private class DefaultEngine<S : Any>(override var reducer: AnyReducer<S>, overri
         middlewares.onEach { it(Order.AfterReduced, storeType, nextState, action) }
         return nextState
     }
+
+    override fun addMiddleware(action: Any, middleware: AnyMiddleware<S>) {
+        middlewares.add(middleware)
+    }
+
+    override fun removeMiddleware(action: Any, middleware: AnyMiddleware<S>): Boolean = middlewares.remove(middleware)
 }
 
 class Store<S : Any> internal constructor(scope: CoroutineScope, initialState: S, private val engine: StateScannerEngine<S>) : StoreType<S>,
@@ -153,12 +167,6 @@ class Store<S : Any> internal constructor(scope: CoroutineScope, initialState: S
     override suspend fun dispatch(actions: Flow<Any>) {
         actions.collect(_actions::emit)
     }
-
-    override fun addMiddleware(middleware: AnyMiddleware<S>) {
-        engine.middlewares.add(middleware)
-    }
-
-    override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean = engine.middlewares.remove(middleware)
 }
 
 fun <S : Any> combineReducers(reducers: List<AnyReducer<S>>): AnyReducer<S> = CompositeReducer(reducers)
