@@ -56,11 +56,11 @@ private class StoreAdapterEngine<S : Any, A : Any>(
         get() = middlewareMap.values.toMutableList() as MutableList<AnyMiddleware<S>>
 
     override fun addMiddleware(action: Any, middleware: AnyMiddleware<S>) {
-        middlewareMap.put(action::class, middleware)
+        middlewareMap.put(action as KClass<out Any>, middleware)
     }
 
     override fun removeMiddleware(action: Any, middleware: AnyMiddleware<S>): Boolean {
-        return middlewareMap.remove(action::class) != null
+        return middlewareMap.remove(action as KClass<out Any>) != null
     }
 }
 
