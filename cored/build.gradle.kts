@@ -26,6 +26,8 @@ kotlin {
             }
         }
     }
+    iosSimulatorArm64()
+
     sourceSets {
         all {
             languageSettings.apply {

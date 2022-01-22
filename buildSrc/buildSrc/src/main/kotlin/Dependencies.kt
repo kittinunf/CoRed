@@ -1,7 +1,7 @@
 // Main libraries
 object Kotlin {
 
-    private const val version = "1.5.31"
+    private const val version = "1.6.10"
 
     const val plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
 
@@ -28,7 +28,7 @@ object AndroidX {
 
 object Coroutines {
 
-    private const val version = "1.5.2-native-mt"
+    private const val version = "1.6.0"
 
     const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
     const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
