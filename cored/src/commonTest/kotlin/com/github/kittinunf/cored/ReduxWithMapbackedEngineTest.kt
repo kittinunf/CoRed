@@ -222,7 +222,8 @@ class ReduxWithMapbackedEngineTest {
             localStore.dispatch(Decrement(100))
         }
 
-        assertEquals(200, sideEffectData.value)
+        assertEquals(100, localStore.currentState.counter)
+        assertEquals(200, sideEffectData.value) // Middleware for Increment is removed so there is no effect here
     }
 
     @Test
