@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
-class StoreAdapterTest {
+class ReduxWithMapbackedEngineTest {
 
     private val counterState = CounterState()
 
@@ -163,6 +163,12 @@ class StoreAdapterTest {
             }
         ))
 
+        localStore.addMiddleware(Decrement::class, Middleware { order: Order, store: StoreType<CounterState>, state: CounterState, action: Decrement ->
+            if (order == Order.AfterReduced) {
+                sideEffectData.value = sideEffectData.value - state.counter
+            }
+        } as AnyMiddleware<CounterState>)
+
         runTest {
             localStore.states
                 .withIndex()
@@ -173,12 +179,51 @@ class StoreAdapterTest {
         }
 
         assertEquals(200, sideEffectData.value)
+
+        // Test after add new middleware
+        runTest {
+            localStore.dispatch(Decrement(10)) // 200 - 90 = 110
+        }
+        assertEquals(110, sideEffectData.value)
     }
 
     @Test
-    @Ignore
     fun `should invoke middleware until remove`() {
-        TODO("Not implemented yet")
+        data class SideEffectData(var value: Int)
+
+        val sideEffectData = SideEffectData(100)
+
+        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+            if (order == Order.BeforeReduce) {
+                assertEquals(0, state.counter)
+                assertTrue(action is Increment)
+            } else {
+                sideEffectData.value = sideEffectData.value + state.counter
+            }
+        }
+
+        val localStore = Store(testScope, CounterState(), reducers, emptyMap())
+        localStore.addMiddleware(Increment::class, middleware)
+
+        runTest {
+            localStore.states
+                .withIndex()
+                .printDebug()
+                .launchIn(testScope)
+
+            localStore.dispatch(Increment(100))
+        }
+        assertEquals(200, sideEffectData.value)
+
+        localStore.removeMiddleware(Increment::class, middleware)
+
+        runTest {
+            localStore.dispatch(Increment(100))
+            localStore.dispatch(Decrement(100))
+        }
+
+        assertEquals(100, localStore.currentState.counter)
+        assertEquals(200, sideEffectData.value) // Middleware for Increment is removed so there is no effect here
     }
 
     @Test

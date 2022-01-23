@@ -15,8 +15,8 @@ fun <S : Any, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>>
-): StoreType<S> {
-    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), mutableMapOf())))
+): Store<S> {
+    return Store(scope, initialState, MapBackedEngine((reducers + SetStateReducerType()).toMutableMap(), mutableMapOf()))
 }
 
 @Suppress("FunctionName")
@@ -25,14 +25,14 @@ fun <S : Any, A : Any> Store(
     initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>>,
     middlewares: Map<KClass<out Any>, Middleware<S, A>>
-): StoreType<S> {
-    return StoreAdapter(Store(scope, initialState, StoreAdapterEngine((reducers + SetStateReducerType()).toMutableMap(), middlewares.toMutableMap())))
+): Store<S> {
+    return Store(scope, initialState, MapBackedEngine((reducers + SetStateReducerType()).toMutableMap(), middlewares.toMutableMap()))
 }
 
-private class StoreAdapterEngine<S : Any, A : Any>(
+private class MapBackedEngine<S : Any, A : Any>(
     val reducerMap: MutableMap<KClass<out Any>, Reducer<S, A>>,
     val middlewareMap: MutableMap<KClass<out Any>, Middleware<S, A>>
-) : StateScannerEngine<S> {
+) : Engine<S> {
 
     override suspend fun scan(storeType: StoreType<S>, state: S, action: Any): S {
         val identifier = action::class
@@ -53,12 +53,21 @@ private class StoreAdapterEngine<S : Any, A : Any>(
     override val reducer: AnyReducer<S> = combineReducers(reducerMap.values.toList() as List<AnyReducer<S>>)
 
     override val middlewares: MutableList<AnyMiddleware<S>>
-        get() = TODO("Not yet implemented")
-}
+        get() = middlewareMap.values.toMutableList() as MutableList<AnyMiddleware<S>>
 
-private class StoreAdapter<S : Any>(private val store: Store<S>) : StoreType<S> by store {
+    override fun addMiddleware(key: Any, middleware: AnyMiddleware<S>) {
+        middlewareMap.put(key as KClass<out Any>, middleware)
+    }
 
-    override fun addMiddleware(middleware: AnyMiddleware<S>) = error("Not supported yet")
+    override fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>): Boolean {
+        return middlewareMap.remove(key as KClass<out Any>) != null
+    }
 
-    override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean = error("Not supported yet")
+    override fun addMiddleware(middleware: AnyMiddleware<S>) {
+        error("This engine does not support this addMiddleware without key, please use fun addMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
+    }
+
+    override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean {
+        error("This engine does not support this removeMiddleware without key, please use fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
+    }
 }
