@@ -189,7 +189,6 @@ class StoreAdapterTest {
     }
 
     @Test
-    @Ignore
     fun `should invoke middleware until remove`() {
         data class SideEffectData(var value: Int)
 
@@ -205,7 +204,7 @@ class StoreAdapterTest {
         }
 
         val localStore = Store(testScope, CounterState(), reducers, emptyMap())
-        localStore.addMiddleware(middleware)
+        localStore.addMiddleware(Increment::class, middleware)
 
         runTest {
             localStore.states
@@ -217,7 +216,7 @@ class StoreAdapterTest {
         }
         assertEquals(200, sideEffectData.value)
 
-        localStore.removeMiddleware(middleware)
+        localStore.removeMiddleware(Increment::class, middleware)
 
         runTest {
             localStore.dispatch(Increment(100))

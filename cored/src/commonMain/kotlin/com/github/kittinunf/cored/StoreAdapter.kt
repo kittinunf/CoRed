@@ -64,10 +64,10 @@ private class MapBackedEngine<S : Any, A : Any>(
     }
 
     override fun addMiddleware(middleware: AnyMiddleware<S>) {
-        error("Not support this addMiddleware with out key, please use override fun addMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
+        error("This engine does not support this addMiddleware with out key, please use fun addMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
     }
 
     override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean {
-        error("Not support this removeMiddleware with out key, please use override fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
+        error("This engine does not support this removeMiddleware with out key, please use fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
     }
 }
