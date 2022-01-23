@@ -207,9 +207,9 @@ class ReduxWithMapbackedEngineTest {
 
         runTest {
             localStore.states
-                    .withIndex()
-                    .printDebug()
-                    .launchIn(testScope)
+                .withIndex()
+                .printDebug()
+                .launchIn(testScope)
 
             localStore.dispatch(Increment(100))
         }

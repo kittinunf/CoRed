@@ -56,7 +56,8 @@ internal class SetStateAction<S : Any>(val newState: S)
 
 internal class SetStateReducer<S : Any> : AnyReducer<S> {
 
-    override fun invoke(currentState: S, action: Any): S = (action as? SetStateAction<S>)?.newState ?: currentState
+    override fun invoke(currentState: S, action: Any): S = (action as? SetStateAction<S>)?.newState
+        ?: currentState
 }
 
 @Suppress("FunctionName")
