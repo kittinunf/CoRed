@@ -42,7 +42,7 @@ dependencies {
 ## How to set this up?
 
 Good question. Let's try to set up a minimal example
-with [StoreAdapter](./cored/src/commonMain/kotlin/com/github/kittinunf/cored/StoreAdapter.kt) with
+with [MapbackedEngine](./cored/src/commonMain/kotlin/com/github/kittinunf/cored/MapbackedEngine.kt) with
 an ability to show a list data from the network.
 
 Assuming that we have a Repository class that already connects to the API somewhere,
@@ -55,6 +55,12 @@ interface CommentRepository {
 }
 ```
 
+With the concrete class implements above interface with your preferred network engine
+
+```kotlin
+class CommentRepositoryImpl : CommentRepository 
+```
+
 Redux with CoRed implementation (the setup part should be under 35~ lines)
 
 ```kotlin
@@ -65,7 +71,7 @@ class CommentsState(val isLoading: Boolean, val comments: List<String>? = null)
 object Load
 class SetComments(val comments: List<String>?)
 
-val repository: CommentRepository // get repository somewhere e.g. manually create, DI, or 3rd party library
+val repository: CommentRepositoryImpl // get repository somewhere e.g. manually create, DI, or 3rd party library
 
 val store = Store(
     scope = viewScope,
