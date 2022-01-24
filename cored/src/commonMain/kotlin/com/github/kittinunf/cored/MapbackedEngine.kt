@@ -52,6 +52,7 @@ fun <S : Any, A : Any> Store(
 }
 
 inline fun <reified A : Any, S : Any> reducerType(reducer: Reducer<S, A>): ReducerType<S, A> = A::class to reducer
+inline fun <reified A : Any, S : Any> effectType(middleware: Middleware<S, A>): EffectType<S, A> = A::class to middleware
 
 private class MapBackedEngine<S : Any, A : Any>(
     val reducerMap: MutableMap<KClass<out Any>, Reducer<S, A>>,
