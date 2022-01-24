@@ -1,10 +1,10 @@
 package com.github.kittinunf.cored.app.api
 
-import com.github.kittinunf.cored.EffectType
+import com.github.kittinunf.cored.ActionMiddleware
 import com.github.kittinunf.cored.Middleware
 import com.github.kittinunf.cored.Reducer
-import com.github.kittinunf.cored.ReducerType
-import com.github.kittinunf.cored.Store
+import com.github.kittinunf.cored.ActionReducer
+import com.github.kittinunf.cored.store.Store
 import com.github.kittinunf.cored.app.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -16,19 +16,19 @@ class SetUsers(val users: List<User>?)
 
 // region Reducer
 @Suppress("FunctionName")
-internal fun LoadUserReducer(): ReducerType<AppState, Load> = Load::class to Reducer { currentState, _ ->
+internal fun LoadUserReducer(): ActionReducer<AppState, Load> = Load::class to Reducer { currentState, _ ->
     currentState.copy(isLoading = true)
 }
 
 @Suppress("FunctionName")
-internal fun SetUsersReducer(): ReducerType<AppState, SetUsers> = SetUsers::class to Reducer { currentState, action ->
+internal fun SetUsersReducer(): ActionReducer<AppState, SetUsers> = SetUsers::class to Reducer { currentState, action ->
     currentState.copy(isLoading = false, users = action.users)
 }
 // endregion
 
 // region Middleware
 @Suppress("FunctionName")
-internal fun LoadUserEffect(scope: CoroutineScope, repository: UserRepository): EffectType<AppState, Load> =
+internal fun LoadUserEffect(scope: CoroutineScope, repository: UserRepository): ActionMiddleware<AppState, Load> =
     Load::class to Middleware { _, store, state, _ ->
         if (state.isLoading) return@Middleware
 
