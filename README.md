@@ -1,6 +1,6 @@
 # CoRed
 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.5-blue.svg)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/kotlin-1.6.10-blue.svg)](http://kotlinlang.org)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.kittinunf.cored/cored?label=Maven%20Central)](https://search.maven.org/artifact/com.github.kittinunf.cored/cored)
 
 CoRed is Redux-like implementation that maintains the benefits of Redux's core idea without the
@@ -119,6 +119,35 @@ store.states
 // dispatch an action 
 store.dispatch(Load)
 ```
+
+or you can use the simplified store creation version like;
+
+```
+val store = Store(
+    scope = viewScope,
+    initialState = CommentsState(),
+    reducers = setOf(
+        reducerType { currentState: CommentsState, action: SetComments -> // This reducer is connected with SetComments action by using SetComments::class as a Key
+            currentState.copy(comments = action.comments)
+        }
+    ),
+    middlewares = setOf(
+        effectType { _: Order, store: Store, state: CommentsState, _: Load -> // This middleware is connected with Load action by using Load::class as a Key
+            if (state.isLoading) return@Middleware
+            scope.launch {
+                val result = repository.getComments()
+                if (result.isSuccess) {
+                    store.dispatch(SetComments(result.value))
+                } else {
+                    store.dispatch(SetComments(null))
+                }
+            }
+        }
+    )
+)
+```
+
+It uses the `T::class` under the hood for you without any other modifications.
 
 For documentation, check more details in the [README](./cored/README.md)
 
