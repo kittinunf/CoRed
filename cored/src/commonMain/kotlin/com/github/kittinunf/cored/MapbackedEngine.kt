@@ -23,11 +23,35 @@ fun <S : Any, A : Any> Store(
 fun <S : Any, A : Any> Store(
     scope: CoroutineScope = GlobalScope,
     initialState: S,
+    reducers: Set<ReducerType<S, A>>
+): Store<S> {
+    val map = reducers.associate { it }
+    return Store(scope, initialState, MapBackedEngine((map + SetStateReducerType()).toMutableMap(), mutableMapOf()))
+}
+
+@Suppress("FunctionName")
+fun <S : Any, A : Any> Store(
+    scope: CoroutineScope = GlobalScope,
+    initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>>,
     middlewares: Map<KClass<out Any>, Middleware<S, A>>
 ): Store<S> {
     return Store(scope, initialState, MapBackedEngine((reducers + SetStateReducerType()).toMutableMap(), middlewares.toMutableMap()))
 }
+
+@Suppress("FunctionName")
+fun <S : Any, A : Any> Store(
+    scope: CoroutineScope = GlobalScope,
+    initialState: S,
+    reducers: Set<ReducerType<S, A>>,
+    middlewares: Set<EffectType<S, A>>
+): Store<S> {
+    val reducerMap = reducers.associate { it }
+    val middlewareMap = middlewares.associate { it }
+    return Store(scope, initialState, MapBackedEngine((reducerMap + SetStateReducerType()).toMutableMap(), middlewareMap.toMutableMap()))
+}
+
+inline fun <reified A : Any, S : Any> reducer(reducer: Reducer<S, A>): ReducerType<S, A> = A::class to reducer
 
 private class MapBackedEngine<S : Any, A : Any>(
     val reducerMap: MutableMap<KClass<out Any>, Reducer<S, A>>,

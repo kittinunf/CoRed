@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
@@ -139,7 +140,7 @@ class Store<S : Any> internal constructor(scope: CoroutineScope, initialState: S
             nextState to action
         }
         .map { it.first }
-        .stateIn(scope, SharingStarted.Lazily, initialState)
+        .stateIn(scope, SharingStarted.WhileSubscribed(), initialState)
 
     override val currentState: S
         get() = states.value
