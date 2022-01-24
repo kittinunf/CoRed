@@ -122,7 +122,7 @@ store.dispatch(Load)
 
 or you can use the simplified store creation version like;
 
-```
+```kotlin
 val store = Store(
     scope = viewScope,
     initialState = CommentsState(),
@@ -147,7 +147,7 @@ val store = Store(
 )
 ```
 
-It uses the `T::class` under the hood for you without any other modifications.
+It uses the reified function with `T::class` for action type like `action: SetComments` or `_: Load` automatically under the hood.
 
 For documentation, check more details in the [README](./cored/README.md)
 
