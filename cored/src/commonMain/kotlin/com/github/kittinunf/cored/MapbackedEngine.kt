@@ -51,7 +51,7 @@ fun <S : Any, A : Any> Store(
     return Store(scope, initialState, MapBackedEngine((reducerMap + SetStateReducerType()).toMutableMap(), middlewareMap.toMutableMap()))
 }
 
-inline fun <reified A : Any, S : Any> reducer(reducer: Reducer<S, A>): ReducerType<S, A> = A::class to reducer
+inline fun <reified A : Any, S : Any> reducerType(reducer: Reducer<S, A>): ReducerType<S, A> = A::class to reducer
 
 private class MapBackedEngine<S : Any, A : Any>(
     val reducerMap: MutableMap<KClass<out Any>, Reducer<S, A>>,

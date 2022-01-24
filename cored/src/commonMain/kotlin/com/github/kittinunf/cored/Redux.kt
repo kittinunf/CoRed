@@ -140,7 +140,7 @@ class Store<S : Any> internal constructor(scope: CoroutineScope, initialState: S
             nextState to action
         }
         .map { it.first }
-        .stateIn(scope, SharingStarted.WhileSubscribed(), initialState)
+        .stateIn(scope, SharingStarted.Lazily, initialState)
 
     override val currentState: S
         get() = states.value

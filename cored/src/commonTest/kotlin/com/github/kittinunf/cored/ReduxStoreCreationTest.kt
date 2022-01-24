@@ -15,10 +15,10 @@ class ReduxStoreCreationTest {
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
 
     private val store = Store(testScope, counterState, setOf(
-        reducer(Reducer { currentState: CounterState, action: Increment ->
+        reducerType(Reducer { currentState: CounterState, action: Increment ->
             currentState.copy(counter = currentState.counter + action.by)
         }),
-        reducer(Reducer { currentState: CounterState, action: Decrement ->
+        reducerType(Reducer { currentState: CounterState, action: Decrement ->
             currentState.copy(counter = currentState.counter - action.by)
         })
     ))
