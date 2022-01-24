@@ -11,14 +11,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ReduxStoreCreationTest {
-    private var counterState = CounterState()
-
-    data class SideEffectData(var value: Int)
-    private val sideEffectData = SideEffectData(10)
 
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
 
-    private val store = Store(testScope, counterState,
+    private val store = Store(testScope, CounterState(),
         setOf(
             reducerType { currentState: CounterState, action: Increment ->
                 currentState.copy(counter = currentState.counter + action.by)
@@ -41,9 +37,11 @@ class ReduxStoreCreationTest {
         )
     )
 
+    data class SideEffectData(var value: Int)
+    private val sideEffectData = SideEffectData(10)
+
     @BeforeTest
     fun before() {
-        counterState = CounterState()
         sideEffectData.value = 10
     }
 
