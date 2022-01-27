@@ -1,5 +1,6 @@
 package com.github.kittinunf.cored
 
+import com.github.kittinunf.cored.store.Store
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -16,21 +17,21 @@ class ReduxStoreCreationTest {
 
     private val store = Store(testScope, CounterState(),
         setOf(
-            reducerType { currentState: CounterState, action: Increment ->
+            reducer { currentState: CounterState, action: Increment ->
                 currentState.copy(counter = currentState.counter + action.by)
             },
-            reducerType { currentState: CounterState, action: Decrement ->
+            reducer { currentState: CounterState, action: Decrement ->
                 currentState.copy(counter = currentState.counter - action.by)
             }
         ),
         setOf(
-            effectType { order, store, state, action: Increment ->
-                if (order == Order.AfterReduced) {
+            middleware { order, store, state, action: Increment ->
+                if (order == Order.AfterReduce) {
                     sideEffectData.value = sideEffectData.value + state.counter
                 }
             },
-            effectType { order, store, state, action: Decrement ->
-                if (order == Order.AfterReduced) {
+            middleware { order, store, state, action: Decrement ->
+                if (order == Order.AfterReduce) {
                     sideEffectData.value = sideEffectData.value - state.counter
                 }
             }

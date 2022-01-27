@@ -1,5 +1,6 @@
 package com.github.kittinunf.cored
 
+import com.github.kittinunf.cored.store.Store
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -13,7 +14,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-class ReduxWithMapbackedEngineTest {
+class ReduxHashEngineTest {
 
     private val counterState = CounterState()
 
@@ -153,18 +154,19 @@ class ReduxWithMapbackedEngineTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val localStore = Store(testScope, CounterState(), reducers, mapOf(
-            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                if (order == Order.BeforeReduce) {
-                    assertEquals(0, state.counter)
-                } else {
-                    sideEffectData.value = sideEffectData.value + state.counter
+        val localStore =
+            Store(testScope, CounterState(), reducers, mapOf(
+                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+                    if (order == Order.BeforeReduce) {
+                        assertEquals(0, state.counter)
+                    } else {
+                        sideEffectData.value = sideEffectData.value + state.counter
+                    }
                 }
-            }
-        ))
+            ))
 
-        localStore.addMiddleware(Decrement::class, Middleware { order: Order, store: StoreType<CounterState>, state: CounterState, action: Decrement ->
-            if (order == Order.AfterReduced) {
+        localStore.addMiddleware(Decrement::class, Middleware { order: Order, store: Store<CounterState>, state: CounterState, action: Decrement ->
+            if (order == Order.AfterReduce) {
                 sideEffectData.value = sideEffectData.value - state.counter
             }
         } as AnyMiddleware<CounterState>)
@@ -202,7 +204,8 @@ class ReduxWithMapbackedEngineTest {
             }
         }
 
-        val localStore = Store(testScope, CounterState(), reducers, emptyMap())
+        val localStore =
+            Store(testScope, CounterState(), reducers, emptyMap())
         localStore.addMiddleware(Increment::class, middleware)
 
         runTest {
@@ -228,15 +231,16 @@ class ReduxWithMapbackedEngineTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val localStore = Store(testScope, CounterState(), reducers, mapOf(
-            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                if (order == Order.BeforeReduce) {
-                    assertEquals(0, state.counter)
-                } else {
-                    assertEquals(100, state.counter)
+        val localStore =
+            Store(testScope, CounterState(), reducers, mapOf(
+                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+                    if (order == Order.BeforeReduce) {
+                        assertEquals(0, state.counter)
+                    } else {
+                        assertEquals(100, state.counter)
+                    }
                 }
-            }
-        ))
+            ))
 
         runTest {
             localStore.states
@@ -270,20 +274,21 @@ class ReduxWithMapbackedEngineTest {
 
     @Test
     fun `should be able to dispatch action from the middleware`() {
-        val localStore = Store(testScope, CounterState(), reducers, mapOf(
-            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                if (order == Order.AfterReduced) {
-                    if (state.counter == 100) {
-                        // dispatch another action from middleware
-                        runTest {
-                            delay(1000)
-                            store.dispatch(Increment(10))
+        val localStore =
+            Store(testScope, CounterState(), reducers, mapOf(
+                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+                    if (order == Order.AfterReduce) {
+                        if (state.counter == 100) {
+                            // dispatch another action from middleware
+                            runTest {
+                                delay(1000)
+                                store.dispatch(Increment(10))
+                            }
+                            store.tryDispatch(Decrement(200))
                         }
-                        store.tryDispatch(Decrement(200))
                     }
                 }
-            }
-        ))
+            ))
 
         runTest {
             localStore.states

@@ -1,5 +1,6 @@
 package com.github.kittinunf.cored
 
+import com.github.kittinunf.cored.store.Store
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -7,7 +8,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -21,7 +21,7 @@ class Increment(val by: Int)
 class Decrement(val by: Int)
 class Set(val value: Int)
 
-typealias CounterStore = StoreType<CounterState>
+typealias CounterStore = Store<CounterState>
 
 class ReduxTest {
 
@@ -164,14 +164,15 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
-            if (order == Order.BeforeReduce) {
-                assertEquals(0, state.counter)
-                assertTrue(action is Increment)
-            } else {
-                sideEffectData.value = sideEffectData.value + state.counter
+        val middleware =
+            AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                    assertTrue(action is Increment)
+                } else {
+                    sideEffectData.value = sideEffectData.value + state.counter
+                }
             }
-        }
 
         store.addMiddleware(middleware)
 
@@ -193,14 +194,15 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
-            if (order == Order.BeforeReduce) {
-                assertEquals(0, state.counter)
-                assertTrue(action is Increment)
-            } else {
-                sideEffectData.value = sideEffectData.value + state.counter
+        val middleware =
+            AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                    assertTrue(action is Increment)
+                } else {
+                    sideEffectData.value = sideEffectData.value + state.counter
+                }
             }
-        }
 
         store.addMiddleware(middleware)
 
@@ -227,15 +229,16 @@ class ReduxTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
-            if (order == Order.BeforeReduce) {
-                assertEquals(0, state.counter)
-                assertTrue(action is Increment)
-            } else {
-                assertEquals(100, state.counter)
-                assertTrue(action is Increment)
+        val middleware =
+            AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                    assertTrue(action is Increment)
+                } else {
+                    assertEquals(100, state.counter)
+                    assertTrue(action is Increment)
+                }
             }
-        }
 
         store.addMiddleware(middleware)
 
@@ -251,20 +254,21 @@ class ReduxTest {
 
     @Test
     fun `should be able to dispatch action from the middleware`() {
-        val middleware = AnyMiddleware { order: Order, store: StoreType<CounterState>, state: CounterState, action: Any ->
-            if (order == Order.BeforeReduce) {
-                assertTrue(action is Increment)
-            } else {
-                assertTrue(action is Increment)
-                if (state.counter == 100) {
-                    // dispatch another action from middleware
-                    runTest {
-                        store.dispatch(Increment(10))
+        val middleware =
+            AnyMiddleware { order: Order, store: Store<CounterState>, state: CounterState, action: Any ->
+                if (order == Order.BeforeReduce) {
+                    assertTrue(action is Increment)
+                } else {
+                    assertTrue(action is Increment)
+                    if (state.counter == 100) {
+                        // dispatch another action from middleware
+                        runTest {
+                            store.dispatch(Increment(10))
+                        }
+                        store.tryDispatch(Increment(200))
                     }
-                    store.tryDispatch(Increment(200))
                 }
             }
-        }
 
         store.addMiddleware(middleware)
 
@@ -314,7 +318,8 @@ class ReduxTest {
             }
         }
 
-        val localStore = Store(testScope, counterState, combineReducers(localReducer, counterReducer))
+        val localStore =
+            Store(testScope, counterState, combineReducers(localReducer, counterReducer))
 
         runTest {
             localStore.states
