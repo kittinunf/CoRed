@@ -52,5 +52,5 @@ object Jacoco {
 object Publishing {
 
     const val groupId = "com.github.kittinunf.cored"
-    const val version = "0.6.1"
+    const val version = "0.7.0"
 }
