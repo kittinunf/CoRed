@@ -51,4 +51,12 @@ internal class HashEngine<S : Any, A : Any>(
     override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean {
         error("This engine does not support this removeMiddleware without key, please use fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
     }
+
+    override fun addReducer(key: Any, reducer: AnyReducer<S>) {
+        reducerMap.put(key as KClass<out Any>, reducer)
+    }
+
+    override fun removeReducer(key: Any, reducer: AnyReducer<S>): Boolean {
+        return reducerMap.remove(key) != null
+    }
 }

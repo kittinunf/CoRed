@@ -22,4 +22,8 @@ internal interface Engine<S : Any> {
     fun addMiddleware(middleware: AnyMiddleware<S>)
 
     fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
+
+    fun addReducer(key: Any, reducer: AnyReducer<S>)
+
+    fun removeReducer(key: Any, reducer: AnyReducer<S>): Boolean
 }
