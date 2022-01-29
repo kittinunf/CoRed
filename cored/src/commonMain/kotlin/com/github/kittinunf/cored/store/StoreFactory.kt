@@ -12,12 +12,11 @@ import com.github.kittinunf.cored.combineReducers
 import com.github.kittinunf.cored.engine.IteratorEngine
 import com.github.kittinunf.cored.engine.HashEngine
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlin.reflect.KClass
 
 @Suppress("FunctionName")
 fun <S : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducer: AnyReducer<S>,
 ): ReduxStore<S> = ReduxStore(
@@ -31,7 +30,7 @@ fun <S : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducer: AnyReducer<S>,
     middleware: AnyMiddleware<S>
@@ -48,7 +47,7 @@ fun <S : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducer: AnyReducer<S>,
     vararg middlewares: AnyMiddleware<S>
@@ -65,7 +64,7 @@ fun <S : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>>
 ): ReduxStore<S> = ReduxStore(
@@ -79,7 +78,7 @@ fun <S : Any, A : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducers: Set<ActionReducer<S, A>>
 ): ReduxStore<S> {
@@ -96,7 +95,7 @@ fun <S : Any, A : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>>,
     middlewares: Map<KClass<out Any>, Middleware<S, A>>
@@ -111,7 +110,7 @@ fun <S : Any, A : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope = GlobalScope,
+    scope: CoroutineScope,
     initialState: S,
     reducers: Set<ActionReducer<S, A>>,
     middlewares: Set<ActionMiddleware<S, A>>
