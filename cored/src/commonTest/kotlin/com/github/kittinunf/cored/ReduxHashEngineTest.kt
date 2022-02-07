@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.testTimeSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -390,6 +389,45 @@ class ReduxHashEngineTest {
 
             store.addReducer(Divide::class, r2)
             store.dispatch(Divide(5))
+        }
+    }
+
+    @Test
+    fun `should be able to dynamically remove new reducer into the store`() {
+        runTest {
+            store.states
+                .withIndex()
+                .onEach { (index, state) ->
+                    when (index) {
+                        0,1 -> { } //do nothing
+                        2 -> assertEquals(200, state.counter)
+                        3 -> assertEquals(40, state.counter)
+                        else -> error("Should not reach here")
+                    }
+                }
+                .printDebug()
+                .launchIn(testScope)
+
+            store.dispatch(Increment(2))
+
+            val r1 = Reducer { currentState: CounterState, action: Multiply ->
+                currentState.copy(counter = currentState.counter * action.by)
+            } as AnyReducer<CounterState>
+
+            store.addReducer(Multiply::class, r1)
+            store.dispatch(Multiply(100))
+
+            val r2 = Reducer { currentState: CounterState, action: Divide ->
+                currentState.copy(counter = currentState.counter / action.by)
+            } as AnyReducer<CounterState>
+
+            store.addReducer(Divide::class, r2)
+            store.dispatch(Divide(5))
+
+            store.removeReducer(Multiply::class)
+
+            store.dispatch(Multiply(100))
+            store.dispatch(Multiply(5))
         }
     }
 }

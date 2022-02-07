@@ -16,15 +16,15 @@ internal class HashEngine<S : Any, A : Any>(
 
     override suspend fun scan(store: Store<S>, state: S, action: Any): S {
         val identifier = action::class
-
+        val reducer = reducerMap[identifier]
         val middleware = middlewareMap[identifier]
-        val reducer = reducerMap.getValue(identifier)
 
         val typedAction = action as? A
 
         return if (typedAction == null) state else {
             middleware?.invoke(Order.BeforeReduce, store, state, typedAction)
-            val nextState = reducer(state, typedAction)
+            // if reducer is not found, we do nothing with our state
+            val nextState = reducer?.invoke(state, typedAction) ?: state
             middleware?.invoke(Order.AfterReduce, store, nextState, typedAction)
             nextState
         }
@@ -56,7 +56,7 @@ internal class HashEngine<S : Any, A : Any>(
         reducerMap.put(key as KClass<out Any>, reducer)
     }
 
-    override fun removeReducer(key: Any, reducer: AnyReducer<S>): Boolean {
+    override fun removeReducer(key: Any): Boolean {
         return reducerMap.remove(key) != null
     }
 }
