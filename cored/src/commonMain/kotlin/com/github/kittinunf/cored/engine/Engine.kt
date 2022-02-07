@@ -1,5 +1,7 @@
 package com.github.kittinunf.cored.engine
 
+import com.github.kittinunf.cored.ActionMiddleware
+import com.github.kittinunf.cored.ActionReducer
 import com.github.kittinunf.cored.AnyMiddleware
 import com.github.kittinunf.cored.AnyReducer
 import com.github.kittinunf.cored.store.Store
@@ -12,18 +14,21 @@ internal interface Engine<S : Any> {
 
     suspend fun scan(store: Store<S>, state: S, action: Any): S
 
-    fun addMiddleware(key: Any, middleware: AnyMiddleware<S>) {
+    fun addMiddleware(actionMiddleware: ActionMiddleware<S, Any>) {
+        val (_, middleware) = actionMiddleware
         addMiddleware(middleware)
     }
 
-    fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>): Boolean =
-        removeMiddleware(middleware)
+    fun removeMiddleware(actionMiddleware: ActionMiddleware<S, Any>): Boolean {
+        val (_, middleware) = actionMiddleware
+        return removeMiddleware(middleware)
+    }
 
     fun addMiddleware(middleware: AnyMiddleware<S>)
 
     fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean
 
-    fun addReducer(key: Any, reducer: AnyReducer<S>)
+    fun addReducer(actionReducer: ActionReducer<S, Any>)
 
     fun removeReducer(key: Any): Boolean
 }

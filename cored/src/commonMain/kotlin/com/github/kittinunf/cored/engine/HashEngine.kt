@@ -1,5 +1,7 @@
 package com.github.kittinunf.cored.engine
 
+import com.github.kittinunf.cored.ActionMiddleware
+import com.github.kittinunf.cored.ActionReducer
 import com.github.kittinunf.cored.AnyMiddleware
 import com.github.kittinunf.cored.AnyReducer
 import com.github.kittinunf.cored.Middleware
@@ -36,12 +38,14 @@ internal class HashEngine<S : Any, A : Any>(
     override val middlewares: MutableList<AnyMiddleware<S>>
         get() = middlewareMap.values.toMutableList() as MutableList<AnyMiddleware<S>>
 
-    override fun addMiddleware(key: Any, middleware: AnyMiddleware<S>) {
-        middlewareMap.put(key as KClass<out Any>, middleware)
+    override fun addMiddleware(actionMiddleware: ActionMiddleware<S, Any>) {
+        val (key, middleware) = actionMiddleware
+        middlewareMap.put(key, middleware)
     }
 
-    override fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>): Boolean {
-        return middlewareMap.remove(key as KClass<out Any>) != null
+    override fun removeMiddleware(actionMiddleware: ActionMiddleware<S, Any>): Boolean {
+        val (key, _) = actionMiddleware
+        return middlewareMap.remove(key) != null
     }
 
     override fun addMiddleware(middleware: AnyMiddleware<S>) {
@@ -52,8 +56,9 @@ internal class HashEngine<S : Any, A : Any>(
         error("This engine does not support this removeMiddleware without key, please use fun removeMiddleware(key: Any, middleware: AnyMiddleware<S>) instead")
     }
 
-    override fun addReducer(key: Any, reducer: AnyReducer<S>) {
-        reducerMap.put(key as KClass<out Any>, reducer)
+    override fun addReducer(actionReducer: ActionReducer<S, Any>) {
+        val (key, reducer) = actionReducer
+        reducerMap.put(key, reducer)
     }
 
     override fun removeReducer(key: Any): Boolean {

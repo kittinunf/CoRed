@@ -165,7 +165,7 @@ class ReduxHashEngineTest {
                 }
             ))
 
-        localStore.addMiddleware(Decrement::class, Middleware { order: Order, store: Store<CounterState>, state: CounterState, action: Decrement ->
+        localStore.addMiddleware(Decrement::class to Middleware { order: Order, store: Store<CounterState>, state: CounterState, action: Decrement ->
             if (order == Order.AfterReduce) {
                 sideEffectData.value = sideEffectData.value - state.counter
             }
@@ -206,7 +206,7 @@ class ReduxHashEngineTest {
 
         val localStore =
             Store(testScope, CounterState(), reducers, emptyMap())
-        localStore.addMiddleware(Increment::class, middleware)
+        localStore.addMiddleware(Increment::class to middleware)
 
         runTest {
             localStore.states
@@ -218,7 +218,7 @@ class ReduxHashEngineTest {
         }
         assertEquals(200, sideEffectData.value)
 
-        localStore.removeMiddleware(Increment::class, middleware)
+        localStore.removeMiddleware(Increment::class to middleware)
 
         runTest {
             localStore.dispatch(Increment(100))
@@ -376,18 +376,18 @@ class ReduxHashEngineTest {
             store.dispatch(Increment(10))
             store.dispatch(Decrement(1))
 
-            val r1 = Reducer { currentState: CounterState, action: Multiply ->
+            val r1 = Multiply::class to Reducer { currentState: CounterState, action: Multiply ->
                 currentState.copy(counter = currentState.counter * action.by)
             } as AnyReducer<CounterState>
 
-            store.addReducer(Multiply::class, r1)
+            store.addReducer(r1)
             store.dispatch(Multiply(100))
 
-            val r2 = Reducer { currentState: CounterState, action: Divide ->
+            val r2 = Divide::class to Reducer { currentState: CounterState, action: Divide ->
                 currentState.copy(counter = currentState.counter / action.by)
             } as AnyReducer<CounterState>
 
-            store.addReducer(Divide::class, r2)
+            store.addReducer(r2)
             store.dispatch(Divide(5))
         }
     }
@@ -402,6 +402,7 @@ class ReduxHashEngineTest {
                         0,1 -> { } //do nothing
                         2 -> assertEquals(200, state.counter)
                         3 -> assertEquals(40, state.counter)
+                        4 -> assertEquals(10, state.counter)
                         else -> error("Should not reach here")
                     }
                 }
@@ -410,24 +411,25 @@ class ReduxHashEngineTest {
 
             store.dispatch(Increment(2))
 
-            val r1 = Reducer { currentState: CounterState, action: Multiply ->
+            val r1 = Multiply::class to Reducer { currentState: CounterState, action: Multiply ->
                 currentState.copy(counter = currentState.counter * action.by)
             } as AnyReducer<CounterState>
 
-            store.addReducer(Multiply::class, r1)
+            store.addReducer(r1)
             store.dispatch(Multiply(100))
 
-            val r2 = Reducer { currentState: CounterState, action: Divide ->
+            val r2 = Divide::class to Reducer { currentState: CounterState, action: Divide ->
                 currentState.copy(counter = currentState.counter / action.by)
             } as AnyReducer<CounterState>
 
-            store.addReducer(Divide::class, r2)
+            store.addReducer(r2)
             store.dispatch(Divide(5))
 
             store.removeReducer(Multiply::class)
 
             store.dispatch(Multiply(100))
             store.dispatch(Multiply(5))
+            store.dispatch(Divide(4)) // Divide should still be usable
         }
     }
 }
