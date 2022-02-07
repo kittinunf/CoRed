@@ -25,10 +25,10 @@ internal class IteratorEngine<S : Any>(
         middlewares.remove(middleware)
 
     override fun addReducer(key: Any, reducer: AnyReducer<S>) {
-        error("This engine does not support this addReducer without key")
+        error("This engine does not support this addReducer")
     }
 
     override fun removeReducer(key: Any, reducer: AnyReducer<S>): Boolean {
-        error("This engine does not support this removeReducer without key")
+        error("This engine does not support this removeReducer")
     }
 }

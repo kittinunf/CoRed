@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.testTimeSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -353,6 +354,42 @@ class ReduxHashEngineTest {
             }
 
             store.dispatch(Decrement(100))
+        }
+    }
+
+    class Multiply(val by: Int)
+    class Divide(val by: Int)
+
+    @Test
+    fun `should be able to dynamically add new reducer into the store`() {
+        runTest {
+            store.states
+                .withIndex()
+                .onEach { (index, state) ->
+                    when (index) {
+                        3 -> assertEquals(900, state.counter)
+                        4 -> assertEquals(180, state.counter)
+                    }
+                }
+                .printDebug()
+                .launchIn(testScope)
+
+            store.dispatch(Increment(10))
+            store.dispatch(Decrement(1))
+
+            val r1 = Reducer { currentState: CounterState, action: Multiply ->
+                currentState.copy(counter = currentState.counter * action.by)
+            } as AnyReducer<CounterState>
+
+            store.addReducer(Multiply::class, r1)
+            store.dispatch(Multiply(100))
+
+            val r2 = Reducer { currentState: CounterState, action: Divide ->
+                currentState.copy(counter = currentState.counter / action.by)
+            } as AnyReducer<CounterState>
+
+            store.addReducer(Divide::class, r2)
+            store.dispatch(Divide(5))
         }
     }
 }

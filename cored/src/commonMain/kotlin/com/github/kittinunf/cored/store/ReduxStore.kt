@@ -1,5 +1,6 @@
 package com.github.kittinunf.cored.store
 
+import com.github.kittinunf.cored.AnyReducer
 import com.github.kittinunf.cored.SetStateAction
 import com.github.kittinunf.cored.engine.Engine
 import kotlinx.coroutines.CoroutineScope
