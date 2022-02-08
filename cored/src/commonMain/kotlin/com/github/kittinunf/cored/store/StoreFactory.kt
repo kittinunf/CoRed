@@ -1,16 +1,16 @@
 package com.github.kittinunf.cored.store
 
+import com.github.kittinunf.cored.ActionMiddleware
+import com.github.kittinunf.cored.ActionReducer
 import com.github.kittinunf.cored.AnyMiddleware
 import com.github.kittinunf.cored.AnyReducer
-import com.github.kittinunf.cored.ActionMiddleware
 import com.github.kittinunf.cored.Middleware
 import com.github.kittinunf.cored.Reducer
-import com.github.kittinunf.cored.ActionReducer
-import com.github.kittinunf.cored.SetStateReducer
 import com.github.kittinunf.cored.SetStateActionReducer
+import com.github.kittinunf.cored.SetStateReducer
 import com.github.kittinunf.cored.combineReducers
-import com.github.kittinunf.cored.engine.IteratorEngine
 import com.github.kittinunf.cored.engine.HashEngine
+import com.github.kittinunf.cored.engine.IteratorEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlin.reflect.KClass
 
@@ -66,7 +66,7 @@ fun <S : Any> Store(
 fun <S : Any, A : Any> Store(
     scope: CoroutineScope,
     initialState: S,
-    reducers: Map<KClass<out Any>, Reducer<S, A>>
+    reducers: Map<KClass<out Any>, Reducer<S, A>> = emptyMap()
 ): ReduxStore<S> = ReduxStore(
     scope = scope,
     initialState = initialState,
@@ -80,7 +80,7 @@ fun <S : Any, A : Any> Store(
 fun <S : Any, A : Any> Store(
     scope: CoroutineScope,
     initialState: S,
-    reducers: Set<ActionReducer<S, A>>
+    reducers: Set<ActionReducer<S, A>> = emptySet()
 ): ReduxStore<S> {
     val map = reducers.associate { it }
     return ReduxStore(

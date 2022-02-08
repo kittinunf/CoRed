@@ -1,5 +1,6 @@
 package com.github.kittinunf.cored.engine
 
+import com.github.kittinunf.cored.ActionReducer
 import com.github.kittinunf.cored.AnyMiddleware
 import com.github.kittinunf.cored.AnyReducer
 import com.github.kittinunf.cored.Order
@@ -23,4 +24,12 @@ internal class IteratorEngine<S : Any>(
 
     override fun removeMiddleware(middleware: AnyMiddleware<S>): Boolean =
         middlewares.remove(middleware)
+
+    override fun addReducer(actionReducer: ActionReducer<S, Any>) {
+        error("This engine does not support this addReducer")
+    }
+
+    override fun removeReducer(actionReducer: ActionReducer<S, Any>): Boolean {
+        error("This engine does not support this removeReducer")
+    }
 }
