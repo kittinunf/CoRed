@@ -18,13 +18,13 @@ internal class HashEngine<S : Any, A : Any>(
 
     override suspend fun scan(store: Store<S>, state: S, action: Any): S {
         val identifier = action::class
+        // if reducer is not found, we do nothing with our state
         val reducer = reducerMap[identifier] ?: return state
 
         val middleware = middlewareMap[identifier]
         val typedAction = action as? A
         return if (typedAction == null) state else {
             middleware?.invoke(Order.BeforeReduce, store, state, typedAction)
-            // if reducer is not found, we do nothing with our state
             val nextState = reducer.invoke(state, typedAction)
             middleware?.invoke(Order.AfterReduce, store, nextState, typedAction)
             nextState

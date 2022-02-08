@@ -411,21 +411,21 @@ class ReduxHashEngineTest {
 
             store.dispatch(Increment(2))
 
-            val r1 = Multiply::class to Reducer { currentState: CounterState, action: Multiply ->
+            val multiply = Multiply::class to Reducer { currentState: CounterState, action: Multiply ->
                 currentState.copy(counter = currentState.counter * action.by)
             } as AnyReducer<CounterState>
 
-            store.addReducer(r1)
+            store.addReducer(multiply)
             store.dispatch(Multiply(100))
 
-            val r2 = Divide::class to Reducer { currentState: CounterState, action: Divide ->
+            val divide = Divide::class to Reducer { currentState: CounterState, action: Divide ->
                 currentState.copy(counter = currentState.counter / action.by)
             } as AnyReducer<CounterState>
 
-            store.addReducer(r2)
+            store.addReducer(divide)
             store.dispatch(Divide(5))
 
-            store.removeReducer(r2)
+            store.removeReducer(multiply)
 
             store.dispatch(Multiply(100))
             store.dispatch(Multiply(5))
