@@ -7,8 +7,8 @@ import com.github.kittinunf.cored.AnyReducer
 import com.github.kittinunf.cored.Middleware
 import com.github.kittinunf.cored.Order
 import com.github.kittinunf.cored.Reducer
-import com.github.kittinunf.cored.store.Store
 import com.github.kittinunf.cored.combineReducers
+import com.github.kittinunf.cored.store.Store
 import kotlin.reflect.KClass
 
 internal class HashEngine<S : Any, A : Any>(
@@ -18,15 +18,14 @@ internal class HashEngine<S : Any, A : Any>(
 
     override suspend fun scan(store: Store<S>, state: S, action: Any): S {
         val identifier = action::class
-        val reducer = reducerMap[identifier]
+        val reducer = reducerMap[identifier] ?: return state
+
         val middleware = middlewareMap[identifier]
-
         val typedAction = action as? A
-
         return if (typedAction == null) state else {
             middleware?.invoke(Order.BeforeReduce, store, state, typedAction)
             // if reducer is not found, we do nothing with our state
-            val nextState = reducer?.invoke(state, typedAction) ?: state
+            val nextState = reducer.invoke(state, typedAction)
             middleware?.invoke(Order.AfterReduce, store, nextState, typedAction)
             nextState
         }
@@ -61,7 +60,8 @@ internal class HashEngine<S : Any, A : Any>(
         reducerMap.put(key, reducer)
     }
 
-    override fun removeReducer(key: Any): Boolean {
+    override fun removeReducer(actionReducer: ActionReducer<S, Any>): Boolean {
+        val (key, _) = actionReducer
         return reducerMap.remove(key) != null
     }
 }

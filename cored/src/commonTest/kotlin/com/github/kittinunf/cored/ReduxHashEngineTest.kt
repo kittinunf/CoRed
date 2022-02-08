@@ -425,7 +425,7 @@ class ReduxHashEngineTest {
             store.addReducer(r2)
             store.dispatch(Divide(5))
 
-            store.removeReducer(Multiply::class)
+            store.removeReducer(r2)
 
             store.dispatch(Multiply(100))
             store.dispatch(Multiply(5))

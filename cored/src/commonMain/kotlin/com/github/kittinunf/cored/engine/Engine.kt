@@ -30,5 +30,5 @@ internal interface Engine<S : Any> {
 
     fun addReducer(actionReducer: ActionReducer<S, Any>)
 
-    fun removeReducer(key: Any): Boolean
+    fun removeReducer(actionReducer: ActionReducer<S, Any>): Boolean
 }

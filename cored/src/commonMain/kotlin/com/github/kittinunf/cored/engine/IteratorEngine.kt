@@ -29,7 +29,7 @@ internal class IteratorEngine<S : Any>(
         error("This engine does not support this addReducer")
     }
 
-    override fun removeReducer(key: Any): Boolean {
+    override fun removeReducer(actionReducer: ActionReducer<S, Any>): Boolean {
         error("This engine does not support this removeReducer")
     }
 }
