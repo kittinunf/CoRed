@@ -10,7 +10,7 @@ enum class Order {
     AfterReduce
 }
 
-inline fun <reified A : Any, S : Any> reducer(reducer: Reducer<S, A>): ActionReducer<S, A> =
+inline fun <reified S : Any, reified A : Any> reducer(reducer: Reducer<S, A>): ActionReducer<S, A> =
     A::class to reducer
 
 fun interface Reducer<S : Any, in A : Any> {
