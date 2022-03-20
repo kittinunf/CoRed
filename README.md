@@ -42,7 +42,7 @@ dependencies {
 ## How to set this up?
 
 Good question. Let's try to set up a minimal example
-with [MapbackedEngine](./cored/src/commonMain/kotlin/com/github/kittinunf/cored/MapbackedEngine.kt) with
+with [HashEngine](./cored/src/commonMain/kotlin/com/github/kittinunf/cored/engine/HashEngine.kt) with
 an ability to show a list data from the network.
 
 Assuming that we have a Repository class that already connects to the API somewhere,
