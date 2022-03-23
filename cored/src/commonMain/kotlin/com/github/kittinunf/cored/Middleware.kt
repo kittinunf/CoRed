@@ -10,5 +10,5 @@ inline fun <reified S : Any, reified A : Any> middleware(middleware: Middleware<
     A::class to middleware
 
 fun interface Middleware<S : Any, in A : Any> {
-    suspend operator fun invoke(order: Order, store: Store<S>, state: S, action: A)
+    operator fun invoke(order: Order, store: Store<S>, state: S, action: A)
 }
