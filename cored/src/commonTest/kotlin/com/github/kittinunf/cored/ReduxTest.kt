@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -97,9 +98,10 @@ class ReduxTest {
     }
 
     @Test
-    fun `should emit value if the state not changed`() {
+    fun `should emit value if the state not changed with stateIn()`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -116,9 +118,10 @@ class ReduxTest {
     }
 
     @Test
-    fun `should not emit same value up until the same state is emitted`() {
+    fun `should not emit same value up until the same state is emitted with stateIn()`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -291,7 +294,9 @@ class ReduxTest {
                 .onEach { (index, state) ->
                     when (index) {
                         1 -> assertEquals(100, state.counter)
-                        2 -> assertEquals(99, state.counter)
+                        2 -> assertEquals(100, state.counter) // Multiply
+                        3 -> assertEquals(100, state.counter) // Divide
+                        4 -> assertEquals(99, state.counter)
                     }
                 }
                 .printDebug()
