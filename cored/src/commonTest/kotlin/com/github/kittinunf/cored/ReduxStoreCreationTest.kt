@@ -25,12 +25,12 @@ class ReduxStoreCreationTest {
             }
         ),
         setOf(
-            middleware { order, store, state, action: Increment ->
+            middleware { order, _, state, _: Increment ->
                 if (order == Order.AfterReduce) {
                     sideEffectData.value = sideEffectData.value + state.counter
                 }
             },
-            middleware { order, store, state, action: Decrement ->
+            middleware { order, _, state, _: Decrement ->
                 if (order == Order.AfterReduce) {
                     sideEffectData.value = sideEffectData.value - state.counter
                 }

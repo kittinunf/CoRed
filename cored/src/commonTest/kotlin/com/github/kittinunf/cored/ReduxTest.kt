@@ -164,7 +164,7 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -193,7 +193,7 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -227,7 +227,7 @@ class ReduxTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)

@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -87,9 +88,10 @@ class ReduxHashEngineTest {
     }
 
     @Test
-    fun `should not emit value if the state not changed`() {
+    fun `should not emit value if the state not changed with .stateIn()`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -106,9 +108,10 @@ class ReduxHashEngineTest {
     }
 
     @Test
-    fun `should not emit same value up until the same state is emitted`() {
+    fun `should not emit same value up until the same state is emitted with .stateIn()`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -396,36 +399,39 @@ class ReduxHashEngineTest {
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
-                        0, 1 -> {} //do nothing
+                        0 -> {} //do nothing
+                        1 -> assertEquals(2, state.counter)
                         2 -> assertEquals(200, state.counter)
                         3 -> assertEquals(40, state.counter)
-                        4 -> assertEquals(10, state.counter)
+                        4 -> assertEquals(40, state.counter)
+                        5 -> assertEquals(40, state.counter)
+                        6 -> assertEquals(10, state.counter)
                         else -> error("Should not reach here")
                     }
                 }
                 .printDebug()
                 .launchIn(testScope)
 
-            store.dispatch(Increment(2))
+            store.dispatch(Increment(2)) // 2
 
             val multiply = Multiply::class to Reducer { currentState: CounterState, action: Multiply ->
                 currentState.copy(counter = currentState.counter * action.by)
             } as AnyReducer<CounterState>
 
             store.addReducer(multiply)
-            store.dispatch(Multiply(100))
+            store.dispatch(Multiply(100)) // 200
 
             val divide = Divide::class to Reducer { currentState: CounterState, action: Divide ->
                 currentState.copy(counter = currentState.counter / action.by)
             } as AnyReducer<CounterState>
 
             store.addReducer(divide)
-            store.dispatch(Divide(5))
+            store.dispatch(Divide(5)) // 40
 
             store.removeReducer(multiply)
 
-            store.dispatch(Multiply(100))
-            store.dispatch(Multiply(5))
+            store.dispatch(Multiply(100)) // 40
+            store.dispatch(Multiply(5)) // 40
             store.dispatch(Divide(4)) // Divide should still be usable
         }
     }
