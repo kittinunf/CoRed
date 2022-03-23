@@ -127,12 +127,12 @@ val store = Store(
     scope = viewScope,
     initialState = CommentsState(),
     reducers = setOf(
-        reducerType { currentState: CommentsState, action: SetComments -> // This reducer is connected with SetComments action by using SetComments::class as a Key
+        reducer { currentState: CommentsState, action: SetComments -> // This reducer is connected with SetComments action by using SetComments::class as a Key
             currentState.copy(comments = action.comments)
         }
     ),
     middlewares = setOf(
-        effectType { _: Order, store: Store, state: CommentsState, _: Load -> // This middleware is connected with Load action by using Load::class as a Key
+        middleware { _: Order, store: Store, state: CommentsState, _: Load -> // This middleware is connected with Load action by using Load::class as a Key
             if (state.isLoading) return@Middleware
             scope.launch {
                 val result = repository.getComments()

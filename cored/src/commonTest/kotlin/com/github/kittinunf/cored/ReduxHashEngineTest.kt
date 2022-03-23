@@ -28,7 +28,7 @@ class ReduxHashEngineTest {
         }
     )
 
-    private val store = Store(testScope, counterState, reducers)
+    private val store = Store(counterState, reducers)
 
     @Test
     fun `should increment state`() {
@@ -155,8 +155,8 @@ class ReduxHashEngineTest {
         val sideEffectData = SideEffectData(100)
 
         val localStore =
-            Store(testScope, CounterState(), reducers, mapOf(
-                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+            Store(CounterState(), reducers, mapOf(
+                Increment::class to Middleware { order: Order, _: CounterStore, state: CounterState, _: Increment ->
                     if (order == Order.BeforeReduce) {
                         assertEquals(0, state.counter)
                     } else {
@@ -165,7 +165,7 @@ class ReduxHashEngineTest {
                 }
             ))
 
-        localStore.addMiddleware(Decrement::class to Middleware { order: Order, store: Store<CounterState>, state: CounterState, action: Decrement ->
+        localStore.addMiddleware(Decrement::class to Middleware { order: Order, _: Store<CounterState>, state: CounterState, _: Decrement ->
             if (order == Order.AfterReduce) {
                 sideEffectData.value = sideEffectData.value - state.counter
             }
@@ -195,7 +195,7 @@ class ReduxHashEngineTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -204,8 +204,7 @@ class ReduxHashEngineTest {
             }
         }
 
-        val localStore =
-            Store(testScope, CounterState(), reducers, emptyMap())
+        val localStore = Store(CounterState(), reducers, emptyMap())
         localStore.addMiddleware(Increment::class to middleware)
 
         runTest {
@@ -231,16 +230,15 @@ class ReduxHashEngineTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val localStore =
-            Store(testScope, CounterState(), reducers, mapOf(
-                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                    if (order == Order.BeforeReduce) {
-                        assertEquals(0, state.counter)
-                    } else {
-                        assertEquals(100, state.counter)
-                    }
+        val localStore = Store(CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, _: CounterStore, state: CounterState, _: Increment ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                } else {
+                    assertEquals(100, state.counter)
                 }
-            ))
+            }
+        ))
 
         runTest {
             localStore.states
@@ -254,7 +252,7 @@ class ReduxHashEngineTest {
 
     @Test
     fun `should invoke even we don't provide the customization on the identifier with the qualified name`() {
-        val localStore = Store(testScope, CounterState(), mapOf(
+        val localStore = Store(CounterState(), mapOf(
             Set::class to Reducer { currentState: CounterState, action: Set ->
                 currentState.copy(counter = action.value)
             }
@@ -274,21 +272,20 @@ class ReduxHashEngineTest {
 
     @Test
     fun `should be able to dispatch action from the middleware`() {
-        val localStore =
-            Store(testScope, CounterState(), reducers, mapOf(
-                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                    if (order == Order.AfterReduce) {
-                        if (state.counter == 100) {
-                            // dispatch another action from middleware
-                            runTest {
-                                delay(1000)
-                                store.dispatch(Increment(10))
-                            }
-                            store.tryDispatch(Decrement(200))
+        val localStore = Store(CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, _: Increment ->
+                if (order == Order.AfterReduce) {
+                    if (state.counter == 100) {
+                        // dispatch another action from middleware
+                        runTest {
+                            delay(1000)
+                            store.dispatch(Increment(10))
                         }
+                        store.tryDispatch(Decrement(200))
                     }
                 }
-            ))
+            }
+        ))
 
         runTest {
             localStore.states
@@ -399,7 +396,7 @@ class ReduxHashEngineTest {
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
-                        0,1 -> { } //do nothing
+                        0, 1 -> {} //do nothing
                         2 -> assertEquals(200, state.counter)
                         3 -> assertEquals(40, state.counter)
                         4 -> assertEquals(10, state.counter)

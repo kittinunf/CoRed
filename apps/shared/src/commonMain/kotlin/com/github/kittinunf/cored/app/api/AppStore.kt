@@ -1,11 +1,11 @@
 package com.github.kittinunf.cored.app.api
 
 import com.github.kittinunf.cored.ActionMiddleware
+import com.github.kittinunf.cored.ActionReducer
 import com.github.kittinunf.cored.Middleware
 import com.github.kittinunf.cored.Reducer
-import com.github.kittinunf.cored.ActionReducer
-import com.github.kittinunf.cored.store.Store
 import com.github.kittinunf.cored.app.repository.UserRepository
+import com.github.kittinunf.cored.store.Store
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -42,7 +42,6 @@ internal fun LoadUserEffect(scope: CoroutineScope, repository: UserRepository): 
 @Suppress("FunctionName")
 internal fun AppStore(scope: CoroutineScope, repository: UserRepository) =
     Store(
-        scope = scope,
         initialState = AppState(),
         reducers = mapOf(LoadUserReducer(), SetUsersReducer()),
         middlewares = mapOf(LoadUserEffect(scope, repository))

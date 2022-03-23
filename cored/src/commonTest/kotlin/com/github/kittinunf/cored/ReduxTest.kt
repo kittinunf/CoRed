@@ -38,7 +38,7 @@ class ReduxTest {
     }
 
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
-    private val store = Store(testScope, counterState, counterReducer)
+    private val store = Store(counterState, counterReducer)
 
     @Test
     fun `should increment state`() {
@@ -314,7 +314,7 @@ class ReduxTest {
             }
         }
 
-        val localStore = Store(testScope, counterState, combineReducers(localReducer, counterReducer))
+        val localStore = Store(counterState, combineReducers(localReducer, counterReducer))
 
         runTest {
             localStore.states

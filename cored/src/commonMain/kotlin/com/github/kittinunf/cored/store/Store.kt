@@ -1,11 +1,10 @@
 package com.github.kittinunf.cored.store
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 interface Store<S : Any> {
 
-    val states: StateFlow<S>
+    val states: Flow<S>
 
     val currentState: S
 

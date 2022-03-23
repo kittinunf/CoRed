@@ -15,7 +15,7 @@ class ReduxStoreCreationTest {
 
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
 
-    private val store = Store(testScope, CounterState(),
+    private val store = Store(CounterState(),
         setOf(
             reducer { currentState: CounterState, action: Increment ->
                 currentState.copy(counter = currentState.counter + action.by)
@@ -39,6 +39,7 @@ class ReduxStoreCreationTest {
     )
 
     data class SideEffectData(var value: Int)
+
     private val sideEffectData = SideEffectData(10)
 
     @BeforeTest

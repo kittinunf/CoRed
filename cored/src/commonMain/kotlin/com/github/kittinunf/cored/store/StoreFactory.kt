@@ -11,16 +11,13 @@ import com.github.kittinunf.cored.SetStateReducer
 import com.github.kittinunf.cored.combineReducers
 import com.github.kittinunf.cored.engine.HashEngine
 import com.github.kittinunf.cored.engine.IteratorEngine
-import kotlinx.coroutines.CoroutineScope
 import kotlin.reflect.KClass
 
 @Suppress("FunctionName")
 fun <S : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducer: AnyReducer<S>,
 ): ReduxStore<S> = ReduxStore(
-    scope = scope,
     initialState = initialState,
     engine = IteratorEngine(
         reducer = combineReducers(reducer, SetStateReducer()),
@@ -30,45 +27,35 @@ fun <S : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducer: AnyReducer<S>,
     middleware: AnyMiddleware<S>
-): ReduxStore<S> {
-    return ReduxStore(
-        scope = scope,
-        initialState = initialState,
-        engine = IteratorEngine(
-            reducer = combineReducers(reducer, SetStateReducer()),
-            middlewares = mutableListOf(middleware)
-        )
+): ReduxStore<S> = ReduxStore(
+    initialState = initialState,
+    engine = IteratorEngine(
+        reducer = combineReducers(reducer, SetStateReducer()),
+        middlewares = mutableListOf(middleware)
     )
-}
+)
 
 @Suppress("FunctionName")
 fun <S : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducer: AnyReducer<S>,
     vararg middlewares: AnyMiddleware<S>
-): ReduxStore<S> {
-    return ReduxStore(
-        scope = scope,
-        initialState = initialState,
-        engine = IteratorEngine(
-            reducer = combineReducers(reducer, SetStateReducer()),
-            middlewares = middlewares.toMutableList()
-        )
+): ReduxStore<S> = ReduxStore(
+    initialState = initialState,
+    engine = IteratorEngine(
+        reducer = combineReducers(reducer, SetStateReducer()),
+        middlewares = middlewares.toMutableList()
     )
-}
+)
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>> = emptyMap()
 ): ReduxStore<S> = ReduxStore(
-    scope = scope,
     initialState = initialState,
     engine = HashEngine(
         reducerMap = (reducers + SetStateActionReducer()).toMutableMap(),
@@ -78,13 +65,11 @@ fun <S : Any, A : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducers: Set<ActionReducer<S, A>> = emptySet()
 ): ReduxStore<S> {
     val map = reducers.associate { it }
     return ReduxStore(
-        scope = scope,
         initialState = initialState,
         engine = HashEngine(
             reducerMap = (map + SetStateActionReducer()).toMutableMap(),
@@ -95,12 +80,10 @@ fun <S : Any, A : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducers: Map<KClass<out Any>, Reducer<S, A>>,
     middlewares: Map<KClass<out Any>, Middleware<S, A>>
 ): ReduxStore<S> = ReduxStore(
-    scope = scope,
     initialState = initialState,
     engine = HashEngine(
         reducerMap = (reducers + SetStateActionReducer()).toMutableMap(),
@@ -110,7 +93,6 @@ fun <S : Any, A : Any> Store(
 
 @Suppress("FunctionName")
 fun <S : Any, A : Any> Store(
-    scope: CoroutineScope,
     initialState: S,
     reducers: Set<ActionReducer<S, A>>,
     middlewares: Set<ActionMiddleware<S, A>>
@@ -118,7 +100,6 @@ fun <S : Any, A : Any> Store(
     val reducerMap = reducers.associate { it }
     val middlewareMap = middlewares.associate { it }
     return ReduxStore(
-        scope = scope,
         initialState = initialState,
         engine = HashEngine(
             reducerMap = (reducerMap + SetStateActionReducer()).toMutableMap(),
