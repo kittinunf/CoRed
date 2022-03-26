@@ -98,7 +98,7 @@ class ReduxTest {
     }
 
     @Test
-    fun `should emit value if the state not changed with stateIn()`() {
+    fun `should emit value if the state not changed with stateIn`() {
         runTest {
             store.states
                 .stateIn(testScope)
@@ -118,7 +118,7 @@ class ReduxTest {
     }
 
     @Test
-    fun `should not emit same value up until the same state is emitted with stateIn()`() {
+    fun `should not emit same value up until the same state is emitted with stateIn`() {
         runTest {
             store.states
                 .stateIn(testScope)
