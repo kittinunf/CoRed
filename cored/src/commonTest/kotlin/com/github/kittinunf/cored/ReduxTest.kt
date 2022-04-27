@@ -264,7 +264,7 @@ class ReduxTest {
                     runTest {
                         store.dispatch(Increment(10))
                     }
-                    store.tryDispatch(Increment(200))
+                    store.dispatch(Increment(200))
                 }
             }
         }
@@ -361,7 +361,7 @@ class ReduxTest {
             store.dispatch(Increment(100))
             store.dispatch(Decrement(1))
 
-            store.trySetState {
+            store.setState {
                 CounterState(1000)
             }
 

@@ -19,13 +19,7 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
 
-    ios {
-        binaries {
-            framework {
-                baseName = "CoRed"
-            }
-        }
-    }
+    ios()
     iosSimulatorArm64()
 
     jvm()

@@ -8,13 +8,9 @@ interface Store<S : Any> {
 
     val currentState: S
 
-    suspend fun dispatch(action: Any)
-
-    fun tryDispatch(action: Any): Boolean
+    fun dispatch(action: Any): Boolean
 
     suspend fun dispatch(actions: Flow<Any>)
 
-    fun trySetState(stateProducer: () -> S): Boolean
-
-    suspend fun setState(stateProducer: () -> S)
+    fun setState(stateProducer: () -> S): Boolean
 }

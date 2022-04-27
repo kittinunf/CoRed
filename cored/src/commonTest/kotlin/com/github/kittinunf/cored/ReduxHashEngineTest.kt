@@ -284,7 +284,7 @@ class ReduxHashEngineTest {
                             delay(1000)
                             store.dispatch(Increment(10))
                         }
-                        store.tryDispatch(Decrement(200))
+                        store.dispatch(Decrement(200))
                     }
                 }
             }
@@ -321,7 +321,7 @@ class ReduxHashEngineTest {
             store.dispatch(Increment(100))
             store.dispatch(Decrement(1))
 
-            store.trySetState {
+            store.setState {
                 CounterState(1000)
             }
 

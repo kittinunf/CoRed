@@ -35,23 +35,14 @@ class ReduxStore<S : Any> internal constructor(initialState: S, private val engi
         .map { (state, _) -> state }
         .onEach { currentState = it }
 
-    override suspend fun setState(stateProducer: () -> S) {
-        val newState = stateProducer()
-        _actions.emit(SetStateAction(newState))
-    }
-
-    override fun trySetState(stateProducer: () -> S): Boolean {
+    override fun setState(stateProducer: () -> S): Boolean {
         val newState = stateProducer()
         return _actions.tryEmit(SetStateAction(newState))
     }
 
-    override suspend fun dispatch(action: Any) {
-        _actions.emit(action)
-    }
-
     override suspend fun dispatch(actions: Flow<Any>) {
-        actions.collect(_actions::emit)
+        actions.collect(_actions::tryEmit)
     }
 
-    override fun tryDispatch(action: Any): Boolean = _actions.tryEmit(action)
+    override fun dispatch(action: Any): Boolean = _actions.tryEmit(action)
 }
