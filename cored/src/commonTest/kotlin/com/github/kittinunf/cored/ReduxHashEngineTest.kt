@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -28,7 +29,7 @@ class ReduxHashEngineTest {
         }
     )
 
-    private val store = Store(testScope, counterState, reducers)
+    private val store = Store(counterState, reducers)
 
     @Test
     fun `should increment state`() {
@@ -87,9 +88,10 @@ class ReduxHashEngineTest {
     }
 
     @Test
-    fun `should not emit value if the state not changed`() {
+    fun `should not emit value if the state not changed with stateIn`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -106,9 +108,10 @@ class ReduxHashEngineTest {
     }
 
     @Test
-    fun `should not emit same value up until the same state is emitted`() {
+    fun `should not emit same value up until the same state is emitted with stateIn`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -155,8 +158,8 @@ class ReduxHashEngineTest {
         val sideEffectData = SideEffectData(100)
 
         val localStore =
-            Store(testScope, CounterState(), reducers, mapOf(
-                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
+            Store(CounterState(), reducers, mapOf(
+                Increment::class to Middleware { order: Order, _: CounterStore, state: CounterState, _: Increment ->
                     if (order == Order.BeforeReduce) {
                         assertEquals(0, state.counter)
                     } else {
@@ -165,7 +168,7 @@ class ReduxHashEngineTest {
                 }
             ))
 
-        localStore.addMiddleware(Decrement::class to Middleware { order: Order, store: Store<CounterState>, state: CounterState, action: Decrement ->
+        localStore.addMiddleware(Decrement::class to Middleware { order: Order, _: Store<CounterState>, state: CounterState, _: Decrement ->
             if (order == Order.AfterReduce) {
                 sideEffectData.value = sideEffectData.value - state.counter
             }
@@ -195,7 +198,7 @@ class ReduxHashEngineTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -204,8 +207,7 @@ class ReduxHashEngineTest {
             }
         }
 
-        val localStore =
-            Store(testScope, CounterState(), reducers, emptyMap())
+        val localStore = Store(CounterState(), reducers, emptyMap())
         localStore.addMiddleware(Increment::class to middleware)
 
         runTest {
@@ -231,16 +233,15 @@ class ReduxHashEngineTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val localStore =
-            Store(testScope, CounterState(), reducers, mapOf(
-                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                    if (order == Order.BeforeReduce) {
-                        assertEquals(0, state.counter)
-                    } else {
-                        assertEquals(100, state.counter)
-                    }
+        val localStore = Store(CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, _: CounterStore, state: CounterState, _: Increment ->
+                if (order == Order.BeforeReduce) {
+                    assertEquals(0, state.counter)
+                } else {
+                    assertEquals(100, state.counter)
                 }
-            ))
+            }
+        ))
 
         runTest {
             localStore.states
@@ -254,7 +255,7 @@ class ReduxHashEngineTest {
 
     @Test
     fun `should invoke even we don't provide the customization on the identifier with the qualified name`() {
-        val localStore = Store(testScope, CounterState(), mapOf(
+        val localStore = Store(CounterState(), mapOf(
             Set::class to Reducer { currentState: CounterState, action: Set ->
                 currentState.copy(counter = action.value)
             }
@@ -274,21 +275,20 @@ class ReduxHashEngineTest {
 
     @Test
     fun `should be able to dispatch action from the middleware`() {
-        val localStore =
-            Store(testScope, CounterState(), reducers, mapOf(
-                Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, action: Increment ->
-                    if (order == Order.AfterReduce) {
-                        if (state.counter == 100) {
-                            // dispatch another action from middleware
-                            runTest {
-                                delay(1000)
-                                store.dispatch(Increment(10))
-                            }
-                            store.tryDispatch(Decrement(200))
+        val localStore = Store(CounterState(), reducers, mapOf(
+            Increment::class to Middleware { order: Order, store: CounterStore, state: CounterState, _: Increment ->
+                if (order == Order.AfterReduce) {
+                    if (state.counter == 100) {
+                        // dispatch another action from middleware
+                        runTest {
+                            delay(1000)
+                            store.dispatch(Increment(10))
                         }
+                        store.dispatch(Decrement(200))
                     }
                 }
-            ))
+            }
+        ))
 
         runTest {
             localStore.states
@@ -321,7 +321,7 @@ class ReduxHashEngineTest {
             store.dispatch(Increment(100))
             store.dispatch(Decrement(1))
 
-            store.trySetState {
+            store.setState {
                 CounterState(1000)
             }
 
@@ -399,36 +399,39 @@ class ReduxHashEngineTest {
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
-                        0,1 -> { } //do nothing
+                        0 -> {} //do nothing
+                        1 -> assertEquals(2, state.counter)
                         2 -> assertEquals(200, state.counter)
                         3 -> assertEquals(40, state.counter)
-                        4 -> assertEquals(10, state.counter)
+                        4 -> assertEquals(40, state.counter)
+                        5 -> assertEquals(40, state.counter)
+                        6 -> assertEquals(10, state.counter)
                         else -> error("Should not reach here")
                     }
                 }
                 .printDebug()
                 .launchIn(testScope)
 
-            store.dispatch(Increment(2))
+            store.dispatch(Increment(2)) // 2
 
             val multiply = Multiply::class to Reducer { currentState: CounterState, action: Multiply ->
                 currentState.copy(counter = currentState.counter * action.by)
             } as AnyReducer<CounterState>
 
             store.addReducer(multiply)
-            store.dispatch(Multiply(100))
+            store.dispatch(Multiply(100)) // 200
 
             val divide = Divide::class to Reducer { currentState: CounterState, action: Divide ->
                 currentState.copy(counter = currentState.counter / action.by)
             } as AnyReducer<CounterState>
 
             store.addReducer(divide)
-            store.dispatch(Divide(5))
+            store.dispatch(Divide(5)) // 40
 
             store.removeReducer(multiply)
 
-            store.dispatch(Multiply(100))
-            store.dispatch(Multiply(5))
+            store.dispatch(Multiply(100)) // 40
+            store.dispatch(Multiply(5)) // 40
             store.dispatch(Divide(4)) // Divide should still be usable
         }
     }

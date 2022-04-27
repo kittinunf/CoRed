@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -38,7 +39,7 @@ class ReduxTest {
     }
 
     private val testScope = CoroutineScope(Dispatchers.Unconfined)
-    private val store = Store(testScope, counterState, counterReducer)
+    private val store = Store(counterState, counterReducer)
 
     @Test
     fun `should increment state`() {
@@ -97,9 +98,10 @@ class ReduxTest {
     }
 
     @Test
-    fun `should emit value if the state not changed`() {
+    fun `should emit value if the state not changed with stateIn`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -116,9 +118,10 @@ class ReduxTest {
     }
 
     @Test
-    fun `should not emit same value up until the same state is emitted`() {
+    fun `should not emit same value up until the same state is emitted with stateIn`() {
         runTest {
             store.states
+                .stateIn(testScope)
                 .withIndex()
                 .onEach { (index, state) ->
                     when (index) {
@@ -164,7 +167,7 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -193,7 +196,7 @@ class ReduxTest {
 
         val sideEffectData = SideEffectData(100)
 
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -227,7 +230,7 @@ class ReduxTest {
 
     @Test
     fun `should invoke middleware in the correct order`() {
-        val middleware = AnyMiddleware { order: Order, store: CounterStore, state: CounterState, action: Any ->
+        val middleware = AnyMiddleware { order: Order, _: CounterStore, state: CounterState, action: Any ->
             if (order == Order.BeforeReduce) {
                 assertEquals(0, state.counter)
                 assertTrue(action is Increment)
@@ -261,7 +264,7 @@ class ReduxTest {
                     runTest {
                         store.dispatch(Increment(10))
                     }
-                    store.tryDispatch(Increment(200))
+                    store.dispatch(Increment(200))
                 }
             }
         }
@@ -291,7 +294,9 @@ class ReduxTest {
                 .onEach { (index, state) ->
                     when (index) {
                         1 -> assertEquals(100, state.counter)
-                        2 -> assertEquals(99, state.counter)
+                        2 -> assertEquals(100, state.counter) // Multiply
+                        3 -> assertEquals(100, state.counter) // Divide
+                        4 -> assertEquals(99, state.counter)
                     }
                 }
                 .printDebug()
@@ -314,7 +319,7 @@ class ReduxTest {
             }
         }
 
-        val localStore = Store(testScope, counterState, combineReducers(localReducer, counterReducer))
+        val localStore = Store(counterState, combineReducers(localReducer, counterReducer))
 
         runTest {
             localStore.states
@@ -356,7 +361,7 @@ class ReduxTest {
             store.dispatch(Increment(100))
             store.dispatch(Decrement(1))
 
-            store.trySetState {
+            store.setState {
                 CounterState(1000)
             }
 
