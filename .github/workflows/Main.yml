@@ -21,7 +21,7 @@ jobs:
           java-version: '11'
 
       - name: Publish to MavenCentral
-        run: ./gradlew publishAllPublicationsToSonatypeRepository --max-workers 1
+        run: ./gradlew publish --max-workers 1
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
